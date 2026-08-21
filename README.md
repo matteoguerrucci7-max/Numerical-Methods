@@ -1,1 +1,55 @@
 # Numerical-Methods
+
+Personal study notes on numerical analysis, written from scratch in
+English, covering chapters 1 through 7 of the course *Metodi Numerici*.
+Each topic is presented as **theory first** (definitions and theorems,
+with the source they come from) followed by a small, tested Python/NumPy
+implementation that verifies or illustrates the result experimentally —
+e.g. showing empirically what the machine epsilon is and why it exists, or
+checking that the condition number of a matrix really does bound how much
+a perturbation of `b` is amplified in the solution `x` of `Ax = b`.
+
+## Contents
+
+The single notebook [`notebooks/L1-L7_numerical_methods.ipynb`](notebooks/L1-L7_numerical_methods.ipynb)
+is organized as:
+
+| Section | Topic |
+|---|---|
+| L1 | Tools of the trade — floating point & machine epsilon, norms, condition number, eigenvalues/eigenvectors, SVD |
+| L2 | Linear systems — Gaussian elimination, LU factorization, Jacobi method, gradient (steepest descent) method |
+| L3 | Nonlinear equations — Newton's method |
+| L4 | Overdetermined systems — normal equations, QR factorization (Gram–Schmidt), least squares |
+| L5 | Polynomial approximation — Lagrange interpolation, interpolation error, piecewise linear interpolation |
+| L6 | Numerical differentiation and integration — finite differences, Newton–Cotes (trapezoidal, Simpson) |
+| L7 | Eigenvalue computation — power method, inverse power method, QR algorithm |
+
+## Sources
+
+- G. Puppo, *Metodi Numerici*, lecture notes, Sapienza Università di Roma
+  (chapters 1–7).
+- A. Greenbaum and T. P. Chartier, *Numerical Methods: Design, Analysis,
+  and Computer Implementation of Algorithms*, Princeton University Press,
+  2012.
+- L. N. Trefethen and D. Bau III, *Numerical Linear Algebra*, SIAM, 1997.
+- G. H. Golub and C. F. Van Loan, *Matrix Computations*, 4th ed., Johns
+  Hopkins University Press, 2013.
+- A. Quarteroni, R. Sacco, F. Saleri, *Numerical Mathematics*, 2nd ed.,
+  Springer, 2007.
+- IEEE Std 754-2019, *IEEE Standard for Floating-Point Arithmetic*.
+
+Each theorem/definition in the notebook cites which of the above it is
+taken from. Copyrighted source material itself (the course PDF, the
+textbook) is **not** included in this repository — only original notes,
+code, and citations.
+
+## Running it
+
+```bash
+pip install -r requirements.txt
+jupyter notebook notebooks/L1-L7_numerical_methods.ipynb
+```
+
+The notebook is committed with its outputs (numbers, tables, plots)
+already computed, so it can also be read directly on GitHub without
+running anything.
