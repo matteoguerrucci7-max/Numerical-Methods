@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Methods · Linear Systems — Direct, Iterative &amp; Gradient Methods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: oklch(0.94 0.006 85); }
+  a { color: oklch(0.52 0.13 250); }
+  a:hover { color: oklch(0.42 0.13 250); }
+</style>
+</head>
+<body>
+<div style="width: 1680px; margin: 0 auto; background: oklch(0.985 0.006 85); color: oklch(0.22 0.01 60); font-family: 'IBM Plex Sans', system-ui, sans-serif; padding: 64px 72px 72px; box-sizing: border-box;">
+
+  <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; border-bottom: 3px solid oklch(0.22 0.01 60); padding-bottom: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: 0.32em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Numerical Methods · Linear systems</div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; line-height: 1;">Direct, iterative and gradient methods</h1>
+      <p style="margin: 0; font-size: 19px; max-width: 760px; color: oklch(0.42 0.01 60); text-wrap: pretty;">Solving A x = b with A ∈ ℝ<sup>n×n</sup>. Three branches, distinguished by what happens to A: it is modified, it is never touched, or it is symmetric positive definite.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.45 0.01 60);">
+      <div style="border: 1px solid oklch(0.82 0.01 80); border-radius: 3px; padding: 8px 12px; letter-spacing: 0.12em;">O(n³) → O(n²) → matrix–vector</div>
+      <div>3 branches · study reference sheet</div>
+    </div>
+  </header>
+
+  <section style="margin-top: 40px; display: grid; grid-template-columns: 300px 1fr; gap: 34px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 14px; position: sticky; top: 24px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Branch 1 · A is modified</div>
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05;">Direct methods</h2>
+      <p style="margin: 0; font-size: 17px; line-height: 1.55; color: oklch(0.42 0.01 60); text-wrap: pretty;">Transform the system into an equivalent triangular one, then solve by substitution.</p>
+      <div style="height: 4px; background: oklch(0.5 0.13 30); width: 64px;"></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start;">
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">1 · Triangular systems</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Lower: a<sub>ij</sub> = 0 for every j &gt; i. Upper: a<sub>ij</sub> = 0 for every i &gt; j. det A is the product of the diagonal entries, so A is invertible ⇔ a<sub>ii</sub> ≠ 0 for all i.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Forward substitution</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sub>1</sub> = b<sub>1</sub> / a<sub>11</sub><br />x<sub>i</sub> = ( b<sub>i</sub> − Σ<sub>j=1</sub><sup>i−1</sup> a<sub>ij</sub> x<sub>j</sub> ) / a<sub>ii</sub>, i = 2,…,n</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Backward substitution</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sub>n</sub> = b<sub>n</sub> / a<sub>nn</sub><br />x<sub>i</sub> = ( b<sub>i</sub> − Σ<sub>j=i+1</sub><sup>n</sup> a<sub>ij</sub> x<sub>j</sub> ) / a<sub>ii</sub>, i = n−1,…,1</div>
+        </div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>Cost.</strong> O(i) operations per x<sub>i</sub>, so about n²/2 in total: O(n²) ≪ O(n³) of the inversion.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Remark</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Always prefer turning a general system into a triangular one (Gauss / LU) and then substituting, rather than inverting A directly.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">2 · Gaussian elimination and pivoting</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>Idea.</strong> A x = b ⟶ U x = b̃ with U upper triangular, through elementary row operations — linear combinations that leave the solution unchanged.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">m<sub>ik</sub> = a<sub>ik</sub><sup>(k−1)</sup> / a<sub>kk</sub><sup>(k−1)</sup></div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Multipliers used to zero the entries below the pivot a<sub>kk</sub>, column by column.</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Pivoting — two distinct motivations</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>1 Necessity.</strong> If a<sub>kk</sub><sup>(k−1)</sup> = 0 the algorithm breaks down (division by zero): swap that row with a lower one having a non-zero entry in the column.</p>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>2 Numerical stability.</strong> Even with a non-zero pivot, a small one makes the multiplier m<sub>ik</sub> large, amplifying the rounding errors already present.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Partial pivoting</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.7; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">ℓ = argmax<sub>k</sub> |a<sub>ik</sub><sup>(k−1)</sup>| ⟶ swap row k ↔ row ℓ</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Remark — do not confuse</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Related to, but distinct from, catastrophic cancellation: there the problem is a subtraction of nearby numbers, here it is a division by a small number producing an amplifying factor — conceptually closer to the condition number.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">3 · LU factorisation</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The Gauss operations are encoded in a lower triangular L (ones on the diagonal, the multipliers m<sub>ik</sub> below it).</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">A = L U<br />with pivoting: P A = L U</div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">P is a permutation matrix.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Practical advantage</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Factorising A once (cost ≈ ⅓n³) allows A x = b to be solved for many different right-hand sides b: each further solve is just two triangular systems, O(n²) each.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section style="margin-top: 52px; padding-top: 40px; border-top: 1px solid oklch(0.86 0.008 80); display: grid; grid-template-columns: 300px 1fr; gap: 34px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Branch 2 · A is never modified</div>
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05;">Iterative methods</h2>
+      <p style="margin: 0; font-size: 17px; line-height: 1.55; color: oklch(0.42 0.01 60); text-wrap: pretty;">A sequence x<sup>(k)</sup> → x built from matrix–vector products only.</p>
+      <div style="height: 4px; background: oklch(0.5 0.13 30); width: 64px;"></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start;">
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Motivation — sparse matrices</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Useful when A is large and sparse: Gaussian elimination causes fill-in — zeros become non-zero during elimination — destroying the sparse structure and with it the memory and speed advantage.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">General scheme — preconditioner M</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sup>(k+1)</sup> = x<sup>(k)</sup> + M<sup>−1</sup>( b − A x<sup>(k)</sup> ) = x<sup>(k)</sup> + M<sup>−1</sup> r<sup>(k)</sup><br />r<sup>(k)</sup> = b − A x<sup>(k)</sup> &nbsp;(residual)</div>
+        </div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">M must be invertible and strikes a compromise: (1) the system with M must be easy to solve; (2) M ≈ A, to converge in few iterations.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Extreme case</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">M = A converges in one step, but the system to solve is the original problem itself.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; padding-top: 4px; border-top: 1px solid oklch(0.9 0.008 80);">
+          <span>M = D</span><span style="color: oklch(0.45 0.01 60);">Jacobi</span>
+          <span>M = D + L</span><span style="color: oklch(0.45 0.01 60);">Gauss–Seidel</span>
+          <span>M = (1/α) I</span><span style="color: oklch(0.45 0.01 60);">Richardson</span>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Jacobi &nbsp;<span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 400; color: oklch(0.5 0.01 60);">M = D</span></h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A = D + E, with D the diagonal of A and E = A − D.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">D x<sup>(k+1)</sup> = b − E x<sup>(k)</sup> ⟹ x<sup>(k+1)</sup> = D<sup>−1</sup>( b − E x<sup>(k)</sup> )<br />x<sub>i</sub><sup>(k+1)</sup> = ( b<sub>i</sub> − Σ<sub>j≠i</sub> a<sub>ij</sub> x<sub>j</sub><sup>(k)</sup> ) / a<sub>ii</sub></div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Error e<sup>(k)</sup> = x<sup>(k)</sup> − x gives e<sup>(k+1)</sup> = −D<sup>−1</sup>E · e<sup>(k)</sup>, hence ‖e<sup>(k)</sup>‖ ≤ ‖D<sup>−1</sup>E‖<sup>k</sup> ‖e<sup>(0)</sup>‖.</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px dashed oklch(0.75 0.05 250); border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">convergence ⇔ ǁD<sup>−1</sup>Eǁ &lt; 1</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">|a<sub>ii</sub>| &gt; Σ<sub>j≠i</sub> |a<sub>ij</sub>| &nbsp;∀ i</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Proof — strict diagonal dominance</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">With the matrix ∞-norm, ‖D<sup>−1</sup>E‖<sub>∞</sub> is the maximum over the rows of ( Σ<sub>j≠i</sub>|a<sub>ij</sub>| / |a<sub>ii</sub>| ), which is &lt; 1 row by row exactly under diagonal dominance.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Gauss–Seidel &nbsp;<span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 400; color: oklch(0.5 0.01 60);">M = D + L</span></h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A = D + L + U, with L strictly lower and U strictly upper triangular.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">a<sub>ii</sub> x<sub>i</sub><sup>(k+1)</sup> = b<sub>i</sub> − Σ<sub>j=1</sub><sup>i−1</sup> a<sub>ij</sub> x<sub>j</sub><sup>(k+1)</sup> − Σ<sub>j=i+1</sub><sup>n</sup> a<sub>ij</sub> x<sub>j</sub><sup>(k)</sup></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Key point</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">For j &lt; i the values already updated within the same iteration, x<sub>j</sub><sup>(k+1)</sup>, are used: an in-place update. This is why Gauss–Seidel converges faster than Jacobi under the same hypotheses — diagonal dominance guarantees convergence of both.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Richardson &nbsp;<span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 400; color: oklch(0.5 0.01 60);">M = (1/α) I</span></h3>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sup>(k+1)</sup> = x<sup>(k)</sup> + α ( b − A x<sup>(k)</sup> ) = x<sup>(k)</sup> + α r<sup>(k)</sup></div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">α is a free scalar, not tied to any entry of A. Convergence: ‖I − αA‖ &lt; 1.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Case A SPD, 2-norm — λ₁ ≥ … ≥ λₙ &gt; 0</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.9;">ǁI − αAǁ<sub>2</sub> = max<sub>i</sub> |1 − αλ<sub>i</sub>| ⟹ 0 &lt; α &lt; 2/λ<sub>1</sub><br />α* = 2 / (λ<sub>1</sub> + λ<sub>n</sub>)<br />ρ = ǁI − α*Aǁ<sub>2</sub> = ( K(A) − 1 ) / ( K(A) + 1 )</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Link with Chapter 1</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The convergence rate depends explicitly on the condition number: K(A) ≈ 1 ⇒ ρ ≈ 0 (fast); K(A) large ⇒ ρ → 1 (very slow).</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Convergence rate</h3>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">‖e<sup>(k)</sup>‖ ≤ ρ<sup>k</sup>‖e<sup>(0)</sup>‖ ≤ ε‖e<sup>(0)</sup>‖<br />k ≥ log(ε) / log(ρ) &nbsp;(ρ &lt; 1)</div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">With ε = 0.1 (one decimal digit): k &gt; log(10)·K(A)/2 ≈ K(A). The number of iterations needed to gain one decimal digit is roughly K(A): if K(A) ≈ 1000, one digit is gained about every 1000 iterations.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Remark — ε ≠ eps</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">ε is a convergence tolerance chosen by the user; eps (machine precision, Chapter 1) is a fixed limit of the floating-point representation. ρ and ε concern the speed of an iterative algorithm, independently of machine precision.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Practical stopping criteria</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>(a) On the residual.</strong> ‖A x<sup>(k)</sup> − b‖ ≤ C · Tol, with C = ‖b‖ or ‖A‖ (1- or ∞-norm, cheap to compute).</p>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>(b) On successive iterates.</strong> ‖x<sup>(k+1)</sup> − x<sup>(k)</sup>‖ ≤ ‖x<sup>(k)</sup>‖ · Tol.</p>
+      </article>
+    </div>
+  </section>
+
+  <section style="margin-top: 52px; padding-top: 40px; border-top: 1px solid oklch(0.86 0.008 80); display: grid; grid-template-columns: 300px 1fr; gap: 34px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Branch 3 · A is SPD</div>
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05;">Gradient-type methods</h2>
+      <p style="margin: 0; font-size: 17px; line-height: 1.55; color: oklch(0.42 0.01 60); text-wrap: pretty;">Symmetry is already part of the definition of SPD; it is not a separate requirement.</p>
+      <div style="height: 4px; background: oklch(0.5 0.13 30); width: 64px;"></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start;">
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Linear system ↔ minimisation problem</h3>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">φ(x) = ½(x, Ax) − (b, x)<br />A x = b ⟺ φ(x) = min<sub>z∈ℝⁿ</sub> φ(z)</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Proof ① solution ⟹ minimum</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">∇φ(z) = Az − b (using the symmetry of A). If A x = b then ∇φ(x) = 0, so x is stationary. Since A is SPD, φ is convex (its Hessian is A, positive definite) and a stationary point of a convex function is the unique global minimum.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Proof ② minimum ⟹ solution</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">φ(x+z) = φ(x) + ½(z, Az) − (z, Ax−b) ≥ φ(x) − (z, Ax−b), because ½(z,Az) ≥ 0 for A SPD. If x is a minimum, φ(x+z) ≥ φ(x) for every z, hence (z, Ax−b) ≥ 0 for all z, including −z. Substituting z → tz with t ∈ ℝ gives (t²/2)(z,Az) − t(z,Ax−b) ≥ 0: for this to hold for every t, small and of either sign, the linear coefficient must vanish. Therefore (z, Ax−b) = 0 for all z ⟹ A x = b.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Observation — A not SPD</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Perturbing φ(x+εz) and differentiating with respect to ε, the critical point solves ½(A + A<sup>T</sup>)x = b instead of A x = b; if A is symmetric, A x = b is recovered. For it to be a minimum rather than a saddle point, all eigenvalues of A must be positive.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">The residual is the steepest-descent direction</h3>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">∇φ(x<sup>(k)</sup>) = A x<sup>(k)</sup> − b = − r<sup>(k)</sup><br />x<sup>(k+1)</sup> = x<sup>(k)</sup> + α<sub>k</sub> r<sup>(k)</sup></div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The gradient points in the direction of steepest increase, so its opposite r<sup>(k)</sup> is the direction of steepest descent. Ortomin and the gradient method share this scheme: only the choice of α<sub>k</sub> differs — in Richardson α is fixed, here α<sub>k</sub> changes at every iteration.</p>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Ortomin — minimises the residual</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">r<sup>(k+1)</sup> = r<sup>(k)</sup> − α<sub>k</sub>(A r<sup>(k)</sup>), so r<sup>(k+1)</sup> ∈ r<sup>(k)</sup> + span(A r<sup>(k)</sup>): a line as α<sub>k</sub> varies. Minimising ‖r<sup>(k+1)</sup>‖ means finding the point of that line closest to the origin — an orthogonal projection, with r<sup>(k+1)</sup> ⊥ A r<sup>(k)</sup>.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">(r<sup>(k+1)</sup>, A r<sup>(k)</sup>) = 0 ⟹ α<sub>k</sub> = (r<sup>(k)</sup>, A r<sup>(k)</sup>) / (A r<sup>(k)</sup>, A r<sup>(k)</sup>)<br />ǁr<sup>(k+1)</sup>ǁ² = ǁr<sup>(k)</sup>ǁ² − (A r<sup>(k)</sup>, r<sup>(k)</sup>)² / ǁr<sup>(k)</sup>ǁ²</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Advantage</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">It only uses the symmetry of the scalar product, not of A: it works for non-SPD A as well, provided (Az, z) ≠ 0 for the current residual. It can fail if A has eigenvalues of opposite sign.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Gradient method — minimises the error in the A-norm</h3>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">ǁzǁ<sub>A</sub> = √(z, Az) &nbsp;(energy norm, defined only for A SPD)<br />0 = (e<sup>(k+1)</sup>, A r<sup>(k)</sup>) ⟹ α<sub>k</sub> = (r<sup>(k)</sup>, r<sup>(k)</sup>) / (r<sup>(k)</sup>, A r<sup>(k)</sup>)</div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">One minimises ‖e<sup>(k+1)</sup>‖<sub>A</sub>² along the line e<sup>(k+1)</sup> ∈ e<sup>(k)</sup> + span(r<sup>(k)</sup>), requiring A-orthogonality between e<sup>(k+1)</sup> and r<sup>(k)</sup>. Convergence is comparable to Richardson with the optimal step, but α<sub>k</sub> is recomputed at every iteration; in practice it still shows a slow “zig-zag” behaviour in many cases.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Careful — do not mix the two formulas</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Ortomin: (r, Ar) / (Ar, Ar). Gradient: (r, r) / (r, Ar). The position of Ar changes both numerator and denominator.</p>
+        </div>
+      </article>
+
+      <article style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; gap: 16px; grid-column: span 2;">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600;">Conjugate gradient</h3>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The error is minimised no longer along a single line but over a plane, using a new direction p<sup>(k)</sup> instead of the residual alone, with e<sup>(k+1)</sup> A-orthogonal to both p<sup>(k)</sup> and p<sup>(k−1)</sup>.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.9; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sup>(k+1)</sup> = x<sup>(k)</sup> + α<sub>k</sub> p<sup>(k)</sup>, &nbsp; e<sup>(k+1)</sup> ∈ e<sup>(k)</sup> + span(p<sup>(k)</sup>, p<sup>(k−1)</sup>)<br />α<sub>k</sub> = (r<sup>(k)</sup>, p<sup>(k)</sup>) / (A p<sup>(k)</sup>, p<sup>(k)</sup>)<br />p<sup>(k)</sup> = r<sup>(k)</sup> − β<sub>k</sub> p<sup>(k−1)</sup>, &nbsp; β<sub>k</sub> = (r<sup>(k)</sup>, A p<sup>(k−1)</sup>) / (p<sup>(k−1)</sup>, A p<sup>(k−1)</sup>)</div>
+        <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">α<sub>k</sub> follows from 0 = (e<sup>(k+1)</sup>, A p<sup>(k)</sup>) = (r<sup>(k)</sup>, p<sup>(k)</sup>) − α<sub>k</sub>(A p<sup>(k)</sup>, p<sup>(k)</sup>); if p<sup>(k)</sup> = r<sup>(k)</sup> the plain gradient formula is recovered. β<sub>k</sub> follows from (e<sup>(k+1)</sup>, A p<sup>(k−1)</sup>) = 0, using the symmetry of A.</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.965 0.02 250); border: 1px solid oklch(0.82 0.06 250); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.45 0.13 250);">Remarkable property</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The directions p<sup>(0)</sup>, p<sup>(1)</sup>, … are mutually A-orthogonal, not just consecutive ones. In an n-dimensional space there cannot be more than n mutually orthogonal directions, so the conjugate gradient reaches the exact solution in at most n steps (in exact arithmetic) — far more efficient than the plain gradient method, which can zig-zag indefinitely.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer style="margin-top: 46px; padding-top: 18px; border-top: 1px solid oklch(0.86 0.008 80); display: flex; justify-content: space-between; gap: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.5 0.01 60);">
+    <span>Summary — linear systems: direct methods (triangular, Gauss/LU, pivoting), iterative methods (Jacobi, Gauss–Seidel, Richardson) and gradient-type methods (Ortomin, gradient, conjugate gradient).</span>
+    <span>Numerical Methods</span>
+  </footer>
+</div>
+</body>
+</html>

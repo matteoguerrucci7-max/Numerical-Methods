@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Methods · Ch1 — Tools of the Trade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: oklch(0.94 0.006 85); }
+  a { color: oklch(0.52 0.13 250); }
+  a:hover { color: oklch(0.42 0.13 250); }
+</style>
+</head>
+<body>
+<div style="width: 1680px; margin: 0 auto; background: oklch(0.985 0.006 85); color: oklch(0.22 0.01 60); font-family: 'IBM Plex Sans', system-ui, sans-serif; padding: 64px 72px 72px; box-sizing: border-box;">
+
+  <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; border-bottom: 3px solid oklch(0.22 0.01 60); padding-bottom: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: 0.32em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Numerical Methods · Chapter 1</div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; line-height: 1;">Tools of the Trade</h1>
+      <p style="margin: 0; font-size: 19px; max-width: 720px; color: oklch(0.42 0.01 60); text-wrap: pretty;">Concept map: floating-point arithmetic, linear algebra, norms, conditioning, eigenvalues and the SVD.</p>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; line-height: 1.7; text-align: right; color: oklch(0.45 0.01 60);">
+      <div>6 topic blocks</div>
+      <div>study reference sheet</div>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 38px; align-items: start;">
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">01</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Machine numbers &amp; floating point</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Problem</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Finite memory versus infinitely many digits of a real number: values must be truncated.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">FP notation</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x = ±0.a<sub>1</sub>…a<sub>t</sub> · β<sup>q</sup></div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">β = 2 (bits), t = mantissa digits, q = exponent (position of the radix point).</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Rounding vs truncation</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Truncation: err ≤ β<sup>1−t</sup>. Rounding: err ≤ ½ β<sup>1−t</sup> = ε. Rounding is always better — the bound is halved.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Key advantage</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The relative error depends only on t, not on q — i.e. not on the magnitude of the number.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">FP operations</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Product: well conditioned (≈ 3ε). Sum: ill conditioned when x + y → 0.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Catastrophic cancellation</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Subtracting two nearby numbers destroys significant digits. Quadratic equation — stable form:</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.8;">x<sub>1</sub> = (−b − sign(b)√Δ) / 2a<br />x<sub>2</sub> = c / (a x<sub>1</sub>)</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">02</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Linear algebra</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Vectors &amp; matrices</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">x ∈ ℝ<sup>n</sup> is a column; A ∈ ℝ<sup>m×n</sup>. The linear map Ax = y is a linear combination of the columns of A.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Rank</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Number of linearly independent columns = dimension of the image. Full rank: rank(A) = n.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Kernel &amp; range</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.8; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">ker(A) = {x : Ax = 0} ∋ 0<br />range(A) = span(columns of A)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Systems Ax = y</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>m = n</strong>, full rank → unique solution.</p>
+            <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>m &gt; n</strong> overdetermined: no exact solution; minimise ǁrǁ with r = Ax − y (residual).</p>
+            <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>m &lt; n</strong> underdetermined: infinitely many solutions; the one of minimum norm is chosen.</p>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Special matrices</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Symmetric: A = A<sup>T</sup>. Orthogonal: Q<sup>T</sup> = Q<sup>−1</sup> → preserves the 2-norm.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">03</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Norms</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Axioms</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9;">ǁxǁ = 0 ⇔ x = 0<br />ǁλxǁ = |λ| ǁxǁ<br />ǁx + yǁ ≤ ǁxǁ + ǁyǁ</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Vector norms</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9;">ǁxǁ<sub>1</sub> = Σ<sub>i</sub> |x<sub>i</sub>| &nbsp;(Manhattan)<br />ǁxǁ<sub>2</sub> = √(x<sup>T</sup>x) &nbsp;(Euclidean)<br />ǁxǁ<sub>∞</sub> = max<sub>i</sub> |x<sub>i</sub>|</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Induced norm</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">ǁAǁ = sup<sub>x≠0</sub> ǁAxǁ / ǁxǁ</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Matrix norms</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9;">ǁAǁ<sub>1</sub> = max column Σ<sub>i</sub>|a<sub>ij</sub>|<br />ǁAǁ<sub>∞</sub> = max row Σ<sub>j</sub>|a<sub>ij</sub>|<br />ǁAǁ<sub>2</sub> = σ<sub>1</sub> (largest singular value)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The 2-norm requires the SVD or the eigenvalues.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">04</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Condition number</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Definition</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">K(A) = ǁAǁ · ǁA<sup>−1</sup>ǁ</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Properties</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">K(A) ≥ 1 always. K(A) = 1 is the minimum, attained by orthogonal matrices. It depends only on A, never on the algorithm used.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Link with the error</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9;">ǁx − x̃ǁ / ǁxǁ ≤ K(A) · ǁb − b̃ǁ / ǁbǁ<br />ǁb − b̃ǁ / ǁbǁ ≤ ε &nbsp;(FP representation)<br />⇒ upper bound ≤ K(A) · ε</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Generalised K₂ (SVD)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">K<sub>2</sub>(A) = σ<sub>1</sub> / σ<sub>k</sub>, where σ<sub>k</sub> is the smallest non-zero singular value.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Residual ≠ K(A)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The residual measures the quality of the algorithm; K(A) measures the sensitivity of the problem.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">05</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Eigenvalues &amp; eigenvectors</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Definition</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">Ax = λx, λ ∈ ℂ, x ∈ ℂ<sup>n</sup><br />det(A − λI) = 0 (characteristic polynomial)<br />eigenvector ∈ ker(A − λI)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Property 1</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Distinct eigenvalues → linearly independent eigenvectors; n distinct ones give a basis of ℝ<sup>n</sup>.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Property 2</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Similar matrices B = C<sup>−1</sup>AC share the same eigenvalues.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Property 3</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">If A is invertible, A<sup>−1</sup> has the same eigenvectors and reciprocal eigenvalues 1/λ.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Symmetric matrices</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Spectral theorem: A = QΛQ<sup>T</sup>. Real eigenvalues, orthogonal eigenvectors — only for square symmetric A.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">06</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Singular value decomposition</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Definition</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">A = UΣV<sup>T</sup></div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Holds for every matrix, rectangular included; it generalises the spectral theorem.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Singular values</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">σ<sub>i</sub> = √(eigenvalues of A<sup>T</sup>A), v<sub>i</sub> = eigenvectors of A<sup>T</sup>A. All σ<sub>i</sub> ≥ 0, real, ordered σ<sub>1</sub> ≥ σ<sub>2</sub> ≥ … ≥ σ<sub>n</sub>.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Sum of rank-1 terms</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A = Σ<sub>i</sub> σ<sub>i</sub> u<sub>i</sub> v<sub>i</sub><sup>T</sup> — each outer product has rank 1.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Low-rank approximation</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A<sub>r</sub> = Σ<sub>i=1</sub><sup>r</sup> σ<sub>i</sub> u<sub>i</sub> v<sub>i</sub><sup>T</sup>, with ǁA − A<sub>r</sub>ǁ<sub>2</sub> = σ<sub>r+1</sub>. Eckart–Young: this is the best possible approximation.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Pseudo-inverse A†</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.9;">A<sup>†</sup> = VΣ<sup>†</sup>U<sup>T</sup><br />Σ<sup>†</sup> = diag(1/σ<sub>1</sub>, …, 1/σ<sub>k</sub>, 0, …, 0)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Applications</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">PCA (SVD of X → principal components), image compression, regularisation when K(A) is large.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer style="margin-top: 42px; padding-top: 18px; border-top: 1px solid oklch(0.86 0.008 80); display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.5 0.01 60);">
+    <span>Concept map — Chapter 1: tools of the trade</span>
+    <span>Numerical Methods</span>
+  </footer>
+</div>
+</body>
+</html>
