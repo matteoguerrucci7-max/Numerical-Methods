@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Methods · Ch3 — Nonlinear Equations and Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: oklch(0.94 0.006 85); }
+  a { color: oklch(0.52 0.13 250); }
+  a:hover { color: oklch(0.42 0.13 250); }
+</style>
+</head>
+<body>
+<div style="width: 1680px; margin: 0 auto; background: oklch(0.985 0.006 85); color: oklch(0.22 0.01 60); font-family: 'IBM Plex Sans', system-ui, sans-serif; padding: 64px 72px 72px; box-sizing: border-box;">
+
+  <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; border-bottom: 3px solid oklch(0.22 0.01 60); padding-bottom: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: 0.32em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Numerical Methods · Chapter 3</div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; line-height: 1;">Nonlinear equations and systems</h1>
+      <p style="margin: 0; font-size: 19px; max-width: 760px; color: oklch(0.42 0.01 60); text-wrap: pretty;">Solving f(y) = 0 when no closed formula exists: bisection, Newton, secant and fixed-point iteration — with the error analysis that explains why each one converges as fast as it does.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.45 0.01 60);">
+      <div style="border: 1px solid oklch(0.82 0.01 80); border-radius: 3px; padding: 8px 12px; letter-spacing: 0.12em;">linear → superlinear → quadratic</div>
+      <div>7 topic blocks · study reference sheet</div>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 38px; align-items: start;">
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">01</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Existence of zeros &amp; conditioning</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Problem</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Given f: ℝ → ℝ, find y with f(y) = 0. Such a y is a root, or zero, of f.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Theorem — existence of zeros</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">f continuous on [a,b], f(a)·f(b) &lt; 0<br />⇒ ∃ y ∈ (a,b) : f(y) = 0</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The sign change forces the graph to cross the axis, but the proof says nothing about where. That gap is what the numerical methods fill.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Conditioning — derivation</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Perturb f vertically by ε (f̃ = f + ε) and let ỹ be the perturbed root, Δx = ỹ − y. Expanding around y:</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">0 = f(y) + f′(y)Δx + O(Δx²) + ε<br />f(y) = 0 ⇒ Δx ≈ −ε / f′(y)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Reading the estimate</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The smaller |f′(y)| — the flatter the curve at the crossing — the larger the displacement for the same ε: the root is ill-conditioned. Extreme case f′(y) = 0 (double root, e.g. f(x) = x²): maximal sensitivity, whatever algorithm is used.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Residual ≠ error</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">As with K(A) for linear systems, conditioning is a property of the problem (f, y), not of the algorithm. Since |f(c<sub>k</sub>)| ≈ |f′(y)|·|c<sub>k</sub> − y|, a tiny residual is no evidence of a small error when |f′(y)| is small.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">02</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Bisection</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Hypotheses</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">f continuous on [a,b] and f(a)·f(b) &lt; 0 — exactly the hypotheses of the existence theorem, turned into an algorithm.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Construction</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">c<sub>k</sub> = (a<sub>k</sub> + b<sub>k</sub>) / 2<br />f(a<sub>k</sub>)·f(c<sub>k</sub>) &lt; 0 ⇒ a<sub>k+1</sub>=a<sub>k</sub>, b<sub>k+1</sub>=c<sub>k</sub><br />else ⇒ a<sub>k+1</sub>=c<sub>k</sub>, b<sub>k+1</sub>=b<sub>k</sub></div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Either branch preserves the bracketing and halves the interval — always, regardless of how f behaves inside it.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Stopping criteria</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>(a) Residual.</strong> |f(c<sub>k</sub>)| &lt; C·Tol — can deceive on ill-conditioned roots: small residual does not imply small error.</p>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;"><strong>(b) Interval width.</strong> |b<sub>k</sub> − a<sub>k</sub>| &lt; C·Tol — more robust: it never depends on the values of f, only on the geometric count of halvings, and does not even require f to be differentiable.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Convergence</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">e<sub>k</sub> = |y − c<sub>k</sub>| ≤ b<sub>k</sub> − a<sub>k</sub><br />b<sub>k</sub> − a<sub>k</sub> = (1/2)<sup>k</sup>(b<sub>0</sub> − a<sub>0</sub>)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Linear convergence with fixed rate 1/2, independent of the conditioning of the root.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Cost per decimal digit</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Requiring (1/2)<sup>k</sup> ≤ 1/10 gives k ≥ ln10 / ln2 ≈ 3.32: about 3–4 iterations per digit, always. Slow, but with a guarantee no other method here offers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">03</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Newton's method</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Construction — tangent line</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">tangent: y − f(x<sub>k</sub>) = f′(x<sub>k</sub>)(x − x<sub>k</sub>)<br />set y = 0 ⇒ x<sub>k+1</sub> = x<sub>k</sub> − f(x<sub>k</sub>) / f′(x<sub>k</sub>)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Starting point</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">x₀ can be any point — no bracketing f(a)f(b) &lt; 0 required. In exchange convergence is not guaranteed: far from y, or near a point with f′ ≈ 0, the nearly horizontal tangent can throw the iteration arbitrarily far, or make it diverge.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Error analysis — Taylor</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">0 = f(y) = f(x<sub>k</sub>) + f′(x<sub>k</sub>)(y−x<sub>k</sub>) + ½f″(ξ<sub>k</sub>)(y−x<sub>k</sub>)²<br />÷ f′(x<sub>k</sub>) ⇒ y − x<sub>k+1</sub> = −½[f″(ξ<sub>k</sub>)/f′(x<sub>k</sub>)](y−x<sub>k</sub>)²<br />e<sub>k+1</sub> ≈ M<sub>k</sub> e<sub>k</sub>², M<sub>k</sub> = ½ f″(ξ<sub>k</sub>)/f′(x<sub>k</sub>)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Quadratic convergence</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The next error is proportional to the square of the current one — correct digits roughly double per iteration. Requires M<sub>k</sub> uniformly bounded; it fails when f′ → 0 near the root, the same phenomenon as an ill-conditioned root.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Newton as fixed point</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">g(x) = x − f(x)/f′(x), x<sub>k+1</sub> = g(x<sub>k</sub>)<br />quotient rule: g′(x) = f(x)f″(x) / [f′(x)]²<br />f(y) = 0 ⇒ g′(y) = 0</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A second, independent proof of quadratic convergence via the fixed-point theory of block 06 — valid for simple roots, f′(y) ≠ 0.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">04</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Secant method</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Idea</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Approximate the derivative in Newton's step by a difference quotient built from two points already computed.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">f′(x<sub>k</sub>) ≈ ( f(x<sub>k</sub>) − f(x<sub>k−1</sub>) ) / ( x<sub>k</sub> − x<sub>k−1</sub> )<br />x<sub>k+1</sub> = x<sub>k</sub> − f(x<sub>k</sub>)·(x<sub>k</sub> − x<sub>k−1</sub>) / ( f(x<sub>k</sub>) − f(x<sub>k−1</sub>) )</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Geometry</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Newton uses the tangent at one point; the secant uses the line through (x<sub>k−1</sub>, f(x<sub>k−1</sub>)) and (x<sub>k</sub>, f(x<sub>k</sub>)) — hence two starting points x₀, x₁ instead of one.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Advantage</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">No explicit computation of f′(x) — valuable when the derivative is expensive, complicated, or not available in closed form.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Cost</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Superlinear but not quadratic convergence: order ≈ 1.618, the golden ratio. Slower per iteration than Newton, but it never needs a reliable evaluation of f′.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">05</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Newton for systems</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Problem</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Given f: ℝ<sup>n</sup> → ℝ<sup>n</sup>, find x̃ with f(x̃) = 0: a vector of n functions vanishing simultaneously.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Why no bisection</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The existence-of-zeros theorem does not generalise: in ℝ<sup>n</sup> there is no natural order relation, so "a &lt; x &lt; b" is meaningless for vectors and there is no interval to halve.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Taylor in ℝⁿ &amp; iteration</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">f(z) = f(x) + J<sub>f</sub>(x)(z−x) + O(‖z−x‖²)<br />set model to 0: J<sub>f</sub>(x<sub>k</sub>) d = −f(x<sub>k</sub>)<br />x<sub>k+1</sub> = x<sub>k</sub> + d</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">J<sub>f</sub>(x) is the Jacobian, the n×n matrix of partial derivatives generalising f′(x). One cannot divide by it: a linear system is solved at each iteration.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Stopping criteria</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Successive iterates: ‖x<sub>k+1</sub> − x<sub>k</sub>‖ ≤ C·Tol with C = ‖x<sub>k</sub>‖. Residual: ‖f(x<sub>k</sub>)‖ ≤ C·Tol with C = ‖f(x₀)‖ — C makes the test relative rather than absolute.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Theorem — local convergence</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Let f be at least C¹ on a convex Ω, and assume: (1) ∃ x* ∈ Ω with f(x*) = 0; (2) J<sub>f</sub>(x*) invertible with ‖J<sub>f</sub><sup>−1</sup>(x*)‖ &lt; C; (3) J<sub>f</sub> Lipschitz-continuous near x*. Then there is a ball B(x*, r) such that Newton converges for every x₀ ∈ B(x*, r). Purely local: no guarantee if you start far away.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; background: oklch(0.965 0.02 250); border: 1px solid oklch(0.82 0.06 250); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.45 0.13 250);">Link with the linear-systems chapter</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Each Newton step is a linear solve (Gauss / LU, or iterative). To contain the cost the Jacobian is often frozen for several iterations instead of being recomputed and refactorised every time.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">06</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Fixed-point iteration</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Definition</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Rewrite f(x) = 0 as an equivalent g(x) = x. A value y with g(y) = y is a fixed point of g. Continuity of g suffices for existence; differentiability is needed only to study convergence.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sub>k+1</sub> = g(x<sub>k</sub>)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Error analysis — Lagrange</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">e<sub>k</sub> = x<sub>k</sub> − y, y = g(y)<br />e<sub>k+1</sub> = g(x<sub>k</sub>) − g(y) = g′(ξ<sub>k</sub>)·e<sub>k</sub><br />|e<sub>k+1</sub>| = |g′(ξ<sub>k</sub>)|·|e<sub>k</sub>|</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Everything hinges on keeping that factor below 1.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Theorem — local convergence</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">g differentiable on I<sub>η</sub> = (y−η, y+η), y fixed point. If |g′(x)| ≤ M &lt; 1 for every x in an interval I<sub>δ</sub> ⊆ I<sub>η</sub>, then x<sub>k+1</sub> = g(x<sub>k</sub>) → y for every x₀ ∈ I<sub>δ</sub>. Proof: iterate the estimate, |e<sub>k</sub>| ≤ M<sup>k</sup>|e₀| → 0. Local: M &lt; 1 is needed only on I<sub>δ</sub>, not on all of ℝ.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Asymptotic rate</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">lim<sub>k→∞</sub> |e<sub>k+1</sub>| / |e<sub>k</sub>| = |g′(y)|</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Linear convergence, faster the smaller |g′(y)|. If |g′(y)| = 0 exactly (as in Newton) the rate is better than linear — quadratic.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Contractions</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">g is a contraction on [a,b] if g is continuous, (1) g: [a,b] → [a,b] and (2) |g(x₁) − g(x₂)| &lt; |x₁ − x₂| for all x₁, x₂ ∈ [a,b]. Contraction theorem: then there exists a unique y ∈ [a,b] with g(y) = y.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Building g in practice</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">g(x) = λf(x) + x, λ ≠ 0 ⇒ (g(x)=x ⇔ f(x)=0)<br />g′(x) = λf′(x) + 1, |g′(x)| &lt; 1 ⇒ −2 &lt; λf′(x) &lt; 0</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">λ must have the sign opposite to f′(x), with |λ| &lt; 2/|f′(x)|. If f′ changes sign on the interval, no constant λ works everywhere and the interval must be restricted.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Two distinct theorems · Newton as special case</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The contraction theorem gives existence and uniqueness of the fixed point; the local theorem with M &lt; 1 gives that the iteration actually reaches it from a close enough x₀. With the variable choice λ(x) = −1/f′(x) one recovers Newton, g′(y) = 0 — the locally optimal λ.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">07</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Fixed point for systems</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Same structure</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">With f, g: ℝ<sup>n</sup> → ℝ<sup>n</sup>, transform f(x) = 0 into g(x) = x; the iteration is unchanged.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">x<sub>k+1</sub> = g(x<sub>k</sub>)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Convergence condition</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">‖J<sub>g</sub>(x)‖ &lt; 1</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The analogue of |g′(x)| &lt; 1, written with the Jacobian of g — not of f — evaluated at the solution x.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Additional requirements</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The matrix norm must be compatible with the chosen vector norm — the same vector-norm / induced-norm pairing as in Chapter 1; J<sub>g</sub> must be continuous; x₀ must lie in a sufficiently small neighbourhood of the solution.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="grid-column: 1 / -1; border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">08</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Method comparison</h2>
+      </div>
+      <div style="padding: 22px; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
+          <thead>
+            <tr style="border-bottom: 2px solid oklch(0.22 0.01 60);">
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Method</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Requires</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Order</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Guarantee</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Systems</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Bisection</td>
+              <td style="padding: 12px 14px;">f continuous, f(a)f(b) &lt; 0</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">linear, rate 1/2</td>
+              <td style="padding: 12px 14px;">always converges</td>
+              <td style="padding: 12px 14px;">no — no order in ℝ<sup>n</sup></td>
+            </tr>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Newton</td>
+              <td style="padding: 12px 14px;">f′, one x₀</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">quadratic</td>
+              <td style="padding: 12px 14px;">local only</td>
+              <td style="padding: 12px 14px;">yes — linear solve per step</td>
+            </tr>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Secant</td>
+              <td style="padding: 12px 14px;">two points, no f′</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">≈ 1.618 (golden ratio)</td>
+              <td style="padding: 12px 14px;">local only</td>
+              <td style="padding: 12px 14px;">quasi-Newton variants</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Fixed point</td>
+              <td style="padding: 12px 14px;">g with |g′| ≤ M &lt; 1</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">linear, rate |g′(y)|</td>
+              <td style="padding: 12px 14px;">local; contraction ⇒ unique root</td>
+              <td style="padding: 12px 14px;">yes — ‖J<sub>g</sub>‖ &lt; 1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer style="margin-top: 42px; padding-top: 18px; border-top: 1px solid oklch(0.86 0.008 80); display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.5 0.01 60);">
+    <span>Concept map — Chapter 3: nonlinear equations and systems</span>
+    <span>Numerical Methods</span>
+  </footer>
+</div>
+</body>
+</html>
