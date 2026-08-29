@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Methods · Ch4 — Overdetermined Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: oklch(0.94 0.006 85); }
+  a { color: oklch(0.52 0.13 250); }
+  a:hover { color: oklch(0.42 0.13 250); }
+</style>
+</head>
+<body>
+<div style="width: 1680px; margin: 0 auto; background: oklch(0.985 0.006 85); color: oklch(0.22 0.01 60); font-family: 'IBM Plex Sans', system-ui, sans-serif; padding: 64px 72px 72px; box-sizing: border-box;">
+
+  <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; border-bottom: 3px solid oklch(0.22 0.01 60); padding-bottom: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: 0.32em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Numerical Methods · Chapter 4</div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; line-height: 1;">Overdetermined systems</h1>
+      <p style="margin: 0; font-size: 19px; max-width: 760px; color: oklch(0.42 0.01 60); text-wrap: pretty;">More equations than unknowns, A ∈ ℝ<sup>m×n</sup>, m &gt; n: least squares, normal equations, QR factorisation, Gram–Schmidt and Householder reflections — four routes to the same minimiser, ranked by numerical stability.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.45 0.01 60);">
+      <div style="border: 1px solid oklch(0.82 0.01 80); border-radius: 3px; padding: 8px 12px; letter-spacing: 0.12em;">K(A)² → K(A) → stable</div>
+      <div>7 topic blocks · study reference sheet</div>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 38px; align-items: start;">
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">01</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">The problem &amp; the functional</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">The problem</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A ∈ ℝ<sup>m×n</sup>, m &gt; n: more equations than unknowns. In general no x satisfies Ax = b exactly, so the system is replaced by minimising the residual instead of solving it.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Functional</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">r = Ax − b<br />φ(x) = ‖Ax−b‖² = (Ax−b, Ax−b)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Minimising ‖r‖² rather than ‖r‖ keeps φ smooth and quadratic, so it can be attacked with calculus — a full gradient in ℝ<sup>n</sup>, not a single derivative.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Four routes, one minimiser</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Normal equations, QR, Gram–Schmidt and Householder all solve the same least-squares problem. They differ only in whether A<sup>T</sup>A is ever formed, and in how the conditioning of A is carried through to the final triangular solve.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Don't confuse</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">K(A) is a property of the problem, an upper bound on the error; it does not judge the algorithm. Residual is a practical measure of fit (e.g. regression); it does.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">02</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Normal equations</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Branch 1 · A<sup>T</sup>A is formed</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Expand φ and set the full gradient — not a directional derivative — to zero.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">φ(x) = x<sup>T</sup>A<sup>T</sup>Ax − 2b<sup>T</sup>Ax + b<sup>T</sup>b<br />∇φ(x) = 2A<sup>T</sup>Ax − 2A<sup>T</sup>b<br />∇φ(x) = 0 ⟹ A<sup>T</sup>A x = A<sup>T</sup>b</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">If rank(A) = n, A<sup>T</sup>A is n×n and invertible ⟹ unique solution x* = (A<sup>T</sup>A)<sup>−1</sup>A<sup>T</sup>b.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Convexity</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">∇²φ(x) = 2A<sup>T</sup>A, SPD if A has full rank</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">φ is convex ⟹ the stationary point found is the global minimum, not merely a critical point.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Geometric reading — orthogonality</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">A<sup>T</sup>Ax − A<sup>T</sup>b = 0 ⟺ A<sup>T</sup>(Ax−b) = 0 ⟺ A<sup>T</sup>r* = 0</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The optimal residual r* is orthogonal to every column of A, hence to all of range(A). Ax* is the orthogonal projection of b onto range(A) ⊂ ℝ<sup>m</sup>.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Practical problem — instability</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.7;">K<sub>2</sub>(A) = σ<sub>1</sub>/σ<sub>n</sub> (SVD)<br />K<sub>2</sub>(A<sup>T</sup>A) = σ<sub>1</sub>²/σ<sub>n</sub>² = K<sub>2</sub>(A)²</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Going from A to A<sup>T</sup>A squares the conditioning: if A is already ill-conditioned, A<sup>T</sup>A becomes drastically unstable. Normal equations are not advisable in that case — use QR.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">03</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">QR factorisation</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Branch 2 · A<sup>T</sup>A never formed</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">A = QR<br />Q ∈ ℝ<sup>m×m</sup> orthogonal (Q<sup>T</sup>Q = I)<br />R ∈ ℝ<sup>m×n</sup> upper triangular</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">rank(A) = rank(R): Q is invertible, so it does not change the rank. R has an active block R<sub>1</sub> ∈ ℝ<sup>n×n</sup>, upper triangular, in its first n rows, with m−n rows of zeros below.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Derivation — reducing the LS problem</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Substitute A = QR and use ‖Qz‖ = ‖z‖ (Q orthogonal):</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">‖Ax−b‖² = ‖QRx−b‖² = ‖Q(Rx−Q<sup>T</sup>b)‖² = ‖Rx−Q<sup>T</sup>b‖²</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">With Q<sup>T</sup>b = (c<sub>1</sub>, c<sub>2</sub>), c<sub>1</sub> ∈ ℝ<sup>n</sup>, c<sub>2</sub> ∈ ℝ<sup>m−n</sup>, and R in blocks: ‖Rx−Q<sup>T</sup>b‖² = ‖R<sub>1</sub>x−c<sub>1</sub>‖² + ‖c<sub>2</sub>‖².</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Solving the reduced system</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">‖c<sub>2</sub>‖² does not depend on x: it is the irreducible minimum residual, the quality of the best possible fit (e.g. R² in statistics). The first term is driven to zero by:</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">R<sub>1</sub> x = c<sub>1</sub><br />n×n triangular → back substitution, O(n²)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Reduced QR</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">Q<sub>1</sub> ∈ ℝ<sup>m×n</sup> = first n columns of Q<br />A = Q<sub>1</sub>R<sub>1</sub>, Q<sub>1</sub><sup>T</sup>Q<sub>1</sub> = I<br />Q<sub>1</sub><sup>T</sup>A = R<sub>1</sub> ⟹ R<sub>1</sub> x = Q<sub>1</sub><sup>T</sup>b</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Q<sub>1</sub> avoids carrying useless blocks of zeros — the practical form actually computed.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.965 0.02 250); border: 1px solid oklch(0.82 0.06 250); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.45 0.13 250);">Advantage over normal equations</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">A<sup>T</sup>A is never formed, the conditioning is never squared. The final system has K(R<sub>1</sub>) = K(A), because Q is orthogonal and K<sub>2</sub>(Q) = 1.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">04</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Gram–Schmidt</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Branch 3 · orthonormal basis — the idea</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Build an orthonormal basis q<sub>1</sub>,…,q<sub>n</sub> of range(A) such that each column a<sub>j</sub> is a combination of q<sub>1</sub>,…,q<sub>j</sub>: this structure is exactly what makes R<sub>1</sub> upper triangular.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">proj<sub>v1</sub>(v<sub>2</sub>) = (v<sub>2</sub>,v<sub>1</sub>)/(v<sub>1</sub>,v<sub>1</sub>) · v<sub>1</sub> = ‖v<sub>2</sub>‖cos(θ)/‖v<sub>1</sub>‖ · v<sub>1</sub></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">CGS — classical</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">q̂<sub>j</sub> = a<sub>j</sub> − Σ<sub>i&lt;j</sub> (a<sub>j</sub>,q<sub>i</sub>) q<sub>i</sub><br />q<sub>j</sub> = q̂<sub>j</sub> / ‖q̂<sub>j</sub>‖</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Entries of R<sub>1</sub>: r<sub>jj</sub> = ‖q̂<sub>j</sub>‖ on the diagonal, r<sub>ij</sub> = (a<sub>j</sub>,q<sub>i</sub>) for i &lt; j, zero below.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.97 0.02 30); border: 1px solid oklch(0.85 0.05 30); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.5 0.13 30);">Instability — numerical rank ≠ mathematical rank</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Nearly dependent columns ⟹ a<sub>j</sub> is almost parallel to its projection ⟹ q̂<sub>j</sub> is a difference of nearly equal quantities ⟹ catastrophic cancellation: ‖q̂<sub>j</sub>‖ comes out small and unreliable. Classical GS loses orthogonality among the computed q<sub>i</sub>.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">rank<sub>ε</sub>(A) = #{ i : σ<sub>i</sub> &gt; ε }</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Link to the SVD: singular values below the threshold are treated as noise — the same principle as low-rank truncation and PCA.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">MGS — modified</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">a<sub>j</sub><sup>(i)</sup> = a<sub>j</sub><sup>(i−1)</sup> − (a<sub>j</sub><sup>(i−1)</sup>, q<sub>i</sub>) q<sub>i</sub></div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Update all remaining columns immediately after each new q<sub>i</sub>, instead of projecting the original a<sub>j</sub> all at once. Equivalent in exact arithmetic; in floating point each projection acts on an already partly cleaned vector → less error accumulation across columns. It does not remove cancellation at the single critical step — that needs Householder.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">05</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Householder</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Branch 4 · reflections — matrices</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">H = I − β v v<sup>T</sup>, β = 2/(v,v) = 2/‖v‖²<br />Hx = x − 2(w,x)w, w = v/‖v‖</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">H is symmetric and orthogonal (H<sup>T</sup>H = I) — not a permutation, a continuous reflection through the hyperplane orthogonal to v. vv<sup>T</sup> is an outer product ⟹ rank 1: H is a rank-1 perturbation of the identity, acting only along v and leaving the orthogonal hyperplane untouched.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Construction — zeroing a vector</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Look for v such that Hx = αe<sub>1</sub> (all components zero except the first). Setting v = x + ce<sub>1</sub> and solving gives c = ±‖x‖.</p>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">c = sign(x<sub>1</sub>) · ‖x‖</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">The sign is chosen to avoid cancellation: if x is nearly parallel to e<sub>1</sub> then x<sub>1</sub> ≈ ±‖x‖, and this way v is always a sum of same-sign quantities, never a dangerous subtraction — the same principle as the stable quadratic formula (Ch. 1).</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">QR via Householder</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.85; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">H<sub>n</sub>···H<sub>1</sub> A = R ⟹ Q = H<sub>1</sub>···H<sub>n</sub></div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Successive reflections H<sub>1</sub>, …, H<sub>n</sub>, each zeroing the entries below the diagonal of one column, acting only on the remaining submatrix.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; background: oklch(0.965 0.02 250); border: 1px solid oklch(0.82 0.06 250); padding: 14px 16px; border-radius: 3px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.45 0.13 250);">The most stable route</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">No explicit subtraction of projections that could approach zero: Q is a product of clean reflections, with a sign choice that explicitly avoids cancellation — stable even for nearly linearly dependent columns.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">06</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Stability scale</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Normal equations</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">K(A<sup>T</sup>A) = K(A)²</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Conditioning squared — the fastest route, but the least stable.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">QR / Gram–Schmidt</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; background: oklch(0.965 0.008 250); border-left: 3px solid oklch(0.52 0.13 250); padding: 9px 12px;">K(R<sub>1</sub>) = K(A)</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Conditioning preserved. MGS keeps orthogonality longer than CGS, but neither removes the single-step cancellation.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.52 0.13 250);">Householder</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.55; text-wrap: pretty;">Reflections with a sign choice that explicitly avoids cancellation — stable even in the critical case of nearly dependent columns.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="grid-column: 1 / -1; border: 1px solid oklch(0.86 0.008 80); background: oklch(1 0 0); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: oklch(0.22 0.01 60); color: oklch(0.985 0.006 85);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 3px 9px; border: 1px solid oklch(0.6 0.01 60); border-radius: 3px;">07</span>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.01em;">Method comparison</h2>
+      </div>
+      <div style="padding: 22px; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
+          <thead>
+            <tr style="border-bottom: 2px solid oklch(0.22 0.01 60);">
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Method</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">A<sup>T</sup>A formed?</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Conditioning</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Cost</th>
+              <th style="text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.01 60);">Stability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Normal equations</td>
+              <td style="padding: 12px 14px;">yes — A<sup>T</sup>A x = A<sup>T</sup>b</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">K(A)²</td>
+              <td style="padding: 12px 14px;">cheapest — one n×n SPD solve</td>
+              <td style="padding: 12px 14px;">worst — squares ill-conditioning</td>
+            </tr>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Classical Gram–Schmidt</td>
+              <td style="padding: 12px 14px;">no — orthonormal basis of range(A)</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">K(A)</td>
+              <td style="padding: 12px 14px;">moderate</td>
+              <td style="padding: 12px 14px;">poor — loses orthogonality on near-dependent columns</td>
+            </tr>
+            <tr style="border-bottom: 1px solid oklch(0.9 0.008 80);">
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Modified Gram–Schmidt</td>
+              <td style="padding: 12px 14px;">no</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">K(A)</td>
+              <td style="padding: 12px 14px;">moderate</td>
+              <td style="padding: 12px 14px;">better — less error accumulation, cancellation not removed</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Householder QR</td>
+              <td style="padding: 12px 14px;">no — orthogonal reflections</td>
+              <td style="padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px;">K(A)</td>
+              <td style="padding: 12px 14px;">highest — n reflections applied to A</td>
+              <td style="padding: 12px 14px;">best — stable even for nearly dependent columns</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer style="margin-top: 42px; padding-top: 18px; border-top: 1px solid oklch(0.86 0.008 80); display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: oklch(0.5 0.01 60);">
+    <span>Concept map — Chapter 4: overdetermined systems</span>
+    <span>Numerical Methods</span>
+  </footer>
+</div>
+</body>
+</html>
