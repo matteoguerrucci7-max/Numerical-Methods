@@ -24,6 +24,21 @@ is organized as:
 | L6 | Numerical differentiation and integration — finite differences, Newton–Cotes (trapezoidal, Simpson) |
 | L7 | Eigenvalue computation — power method, inverse power method, QR algorithm |
 
+## Diagrams
+
+The [`diagrams/`](diagrams) folder collects standalone HTML reference
+sheets that summarize a topic visually, as a complement to the notebook:
+
+| File | Topic | View rendered |
+|---|---|---|
+| [`L1_tools_of_the_trade.html`](diagrams/L1_tools_of_the_trade.html) | Chapter 1 concept map — floating point, norms, condition number, eigenvalues, SVD | [open](https://htmlpreview.github.io/?https://raw.githubusercontent.com/matteoguerrucci7-max/Numerical-Methods/main/diagrams/L1_tools_of_the_trade.html) |
+| [`L2_linear_systems.html`](diagrams/L2_linear_systems.html) | Linear systems — direct methods, iterative methods, gradient-type methods | [open](https://htmlpreview.github.io/?https://raw.githubusercontent.com/matteoguerrucci7-max/Numerical-Methods/main/diagrams/L2_linear_systems.html) |
+| [`L3_nonlinear_equations_systems.html`](diagrams/L3_nonlinear_equations_systems.html) | Nonlinear equations and systems — bisection, Newton, secant, fixed-point iteration and their generalization to ℝⁿ | [open](https://htmlpreview.github.io/?https://raw.githubusercontent.com/matteoguerrucci7-max/Numerical-Methods/main/diagrams/L3_nonlinear_equations_systems.html) |
+
+GitHub only shows the raw HTML source when you click a file above —
+use the "open" links to see it rendered directly in the browser
+(via [htmlpreview.github.io](https://htmlpreview.github.io)).
+
 ## Sources
 
 - G. Puppo, *Metodi Numerici*, lecture notes, Sapienza Università di Roma
