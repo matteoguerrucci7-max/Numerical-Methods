@@ -5,25 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Direzioni di lavoro in 3D · PCA rugby</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3efe4;--card:#fbf9f3;--line:#ddd6c4;--line2:#e6dfcd;--ink:#1c211d;--soft:#4b5149;--muted:#5f665d;--faint:#8b8676;--acc:#b33a0b;--accbg:#f6e3d8;--teal:#1f6f78}
+:root{--bg:#0e1712;--card:#142019;--line:#24342b;--line2:#24342b;--ink:#eef2ea;--soft:#c3cec6;--muted:#9fb0a4;--faint:#7f9387;--acc:#f5d565;--accbg:#262d1c;--teal:#6cc4c0}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
 body{display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
 #scaler{width:1280px;height:800px;transform-origin:top left}
 #app{width:1280px;height:800px;padding:22px 40px 22px;display:flex;flex-direction:column;gap:11px;overflow:hidden}
 .mono{font-family:'IBM Plex Mono',monospace}
-.serif{font-family:'Fraunces',Georgia,serif}
+.serif{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
 .kicker{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-h1{margin:4px 0 0;font-weight:600;font-size:36px;line-height:1.05}
+h1{margin:4px 0 0;font-weight:700;font-size:42px;line-height:1}
 button{font-family:'IBM Plex Sans',sans-serif}
-.ctl{height:44px;min-width:44px;border-radius:10px;border:1px solid #d6cfbd;background:var(--card);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:14px;font-weight:500}
-.ctl:hover{background:#ece6d6}
-.tab{height:44px;padding:0 13px;border-radius:10px;border:1px solid #d6cfbd;background:var(--card);color:var(--ink);cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.tab:hover{border-color:#8b8676}
-.tab.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
-.step.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.ctl{height:44px;min-width:44px;border-radius:10px;border:1px solid #2c3f33;background:var(--card);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:14px;font-weight:500}
+.ctl:hover{background:#1f2e25}
+.tab{height:44px;padding:0 13px;border-radius:10px;border:1px solid #2c3f33;background:var(--card);color:var(--ink);cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab:hover{border-color:#7f9387}
+.tab.on{background:#1f2e25;color:var(--ink);border-color:var(--acc)}
+.step.on{background:#1f2e25;color:var(--ink);border-color:var(--acc)}
 .step.done{color:var(--ink)}
 .step{color:var(--muted)}
 .card{border-radius:16px;background:var(--card);border:1px solid var(--line);overflow:hidden}
@@ -36,7 +36,7 @@ svg#st{display:block;cursor:grab;touch-action:none}
 .grid{display:grid;grid-template-columns:20px 128px 116px 42px 100px minmax(0,1fr);gap:6px;align-items:center;padding:0 6px}
 .row{height:27px;border-radius:6px}
 .bars{position:relative;height:14px}
-.tag{justify-self:start;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;border:1px solid transparent}
+.tag{justify-self:start;font-size:11.5px;font-weight:500;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -57,7 +57,7 @@ svg#st{display:block;cursor:grab;touch-action:none}
 </div>
 
 <div style="height:22px;display:flex;align-items:center;gap:10px;font-size:14.5px">
-<span style="width:8px;height:8px;border-radius:4px;background:var(--acc);flex-shrink:0"></span><span id="caption"></span>
+<span id="caption" style="color:var(--soft)"></span>
 </div>
 
 <div style="display:flex;gap:18px;flex-grow:1;min-height:0">
@@ -76,7 +76,7 @@ svg#st{display:block;cursor:grab;touch-action:none}
 
 <div class="card" style="flex-grow:1;min-width:0;padding:14px 20px;display:flex;flex-direction:column;gap:7px">
 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
-<span class="serif" style="font-size:20px;font-weight:600" id="tblTitle"></span>
+<span class="serif" style="font-size:23px;font-weight:600" id="tblTitle"></span>
 <span class="mono" style="font-size:12px;color:var(--muted)" id="tblSub"></span>
 </div>
 <div class="grid mono" style="font-size:11px;color:var(--muted)"><span>#</span><span>statistica</span><span style="text-align:center">peso</span><span></span><span>giocatore ● vs ruolo ◆</span><span>esito</span></div>
@@ -130,7 +130,7 @@ var CAPTIONS = [
 var STEP_LABELS = ['Asse più debole', 'Pesi', 'Filtro', 'Effetto', 'Mentore'];
 var STEP_T = [0, 3, 6, 9.5, 12.3];
 var CT = 15, END = CT * CASES.length;
-var ACC = '#b33a0b', TEAL = '#1f6f78';
+var ACC = '#f5d565', TEAL = '#6cc4c0';
 var AXT = [['b₁ contatto', 'gioco al largo'], ['b₂ portatore', 'poco palla'], ['b₃ placcaggi, passaggi', 'portate, ruck']];
 var AXL = [3.9, 3.0, 2.3];
 var S = 58, CX = 280, CY = 214, FLOOR = -3.7;
@@ -185,15 +185,15 @@ function render(t){
   var yaw=0.55+0.35*Math.sin(0.18*t)+state.yawOff, pitch=clamp(0.32+state.pitchOff,-0.2,1.3);
   var cam={cy:Math.cos(yaw),sy:Math.sin(yaw),cp:Math.cos(pitch),sp:Math.sin(pitch)};
   var h=[];
-  for(var a=-3.5;a<=3.51;a+=1.75){var p=project([a,FLOOR,-2.5],cam),q=project([a,FLOOR,2.5],cam);h.push('<line x1="'+f1(p.x)+'" y1="'+f1(p.y)+'" x2="'+f1(q.x)+'" y2="'+f1(q.y)+'" stroke="#e3dccb"/>');}
-  for(var b2=-2.5;b2<=2.51;b2+=1.25){var p2=project([-3.5,FLOOR,b2],cam),q2=project([3.5,FLOOR,b2],cam);h.push('<line x1="'+f1(p2.x)+'" y1="'+f1(p2.y)+'" x2="'+f1(q2.x)+'" y2="'+f1(q2.y)+'" stroke="#e3dccb"/>');}
+  for(var a=-3.5;a<=3.51;a+=1.75){var p=project([a,FLOOR,-2.5],cam),q=project([a,FLOOR,2.5],cam);h.push('<line x1="'+f1(p.x)+'" y1="'+f1(p.y)+'" x2="'+f1(q.x)+'" y2="'+f1(q.y)+'" stroke="#22322a"/>');}
+  for(var b2=-2.5;b2<=2.51;b2+=1.25){var p2=project([-3.5,FLOOR,b2],cam),q2=project([3.5,FLOOR,b2],cam);h.push('<line x1="'+f1(p2.x)+'" y1="'+f1(p2.y)+'" x2="'+f1(q2.x)+'" y2="'+f1(q2.y)+'" stroke="#22322a"/>');}
   var hl=ramp(lt,0.4,0.5)>0.5;
   for(var k=0;k<3;k++){
     var pv=[0,0,0],mv=[0,0,0],pl=[0,0,0],ml=[0,0,0];pv[k]=AXL[k];mv[k]=-AXL[k];pl[k]=AXL[k]+0.35;ml[k]=-AXL[k]-0.3;
     var P=project(pv,cam),M=project(mv,cam),PL=project(pl,cam),ML=project(ml,cam),on=k===j&&hl;
-    h.push('<line x1="'+f1(M.x)+'" y1="'+f1(M.y)+'" x2="'+f1(P.x)+'" y2="'+f1(P.y)+'" stroke="'+(on?ACC:(k===2?'#d8d1bf':'#b9b3a3'))+'" stroke-width="'+(on?3:1.2)+'"'+(k===2?' stroke-dasharray="4 4"':'')+' stroke-linecap="round"/>');
-    h.push('<text x="'+f1(PL.x)+'" y="'+f1(PL.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="500" fill="'+(on?ACC:(k===2?'#a39d8c':'#5f665d'))+'">'+AXT[k][0]+'</text>');
-    h.push('<text x="'+f1(ML.x)+'" y="'+f1(ML.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#a39d8c">'+AXT[k][1]+'</text>');
+    h.push('<line x1="'+f1(M.x)+'" y1="'+f1(M.y)+'" x2="'+f1(P.x)+'" y2="'+f1(P.y)+'" stroke="'+(on?ACC:(k===2?'#33463a':'#5d7064'))+'" stroke-width="'+(on?3:1.2)+'"'+(k===2?' stroke-dasharray="4 4"':'')+' stroke-linecap="round"/>');
+    h.push('<text x="'+f1(PL.x)+'" y="'+f1(PL.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="500" fill="'+(on?ACC:(k===2?'#7f9387':'#9fb0a4'))+'">'+AXT[k][0]+'</text>');
+    h.push('<text x="'+f1(ML.x)+'" y="'+f1(ML.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7f9387">'+AXT[k][1]+'</text>');
   }
 
   var mentorOn=step===4, effOn=step>=3;
@@ -201,7 +201,7 @@ function render(t){
   var R=project(c.rz,cam), PP=pts[c.n];
   // ombre per i punti in evidenza
   var focus=[c.n].concat(c.rm); if(mentorOn)focus.push(c.mi);
-  focus.forEach(function(i){var F=project([Z[i][0],FLOOR,Z[i][2]],cam);h.push('<line x1="'+f1(pts[i].x)+'" y1="'+f1(pts[i].y)+'" x2="'+f1(F.x)+'" y2="'+f1(F.y)+'" stroke="#cfc8b6" stroke-dasharray="2 3"/><ellipse cx="'+f1(F.x)+'" cy="'+f1(F.y)+'" rx="'+f1(6*F.k)+'" ry="'+f1(2.2*F.k*Math.max(0.3,cam.sp))+'" fill="#d9d2c0"/>');});
+  focus.forEach(function(i){var F=project([Z[i][0],FLOOR,Z[i][2]],cam);h.push('<line x1="'+f1(pts[i].x)+'" y1="'+f1(pts[i].y)+'" x2="'+f1(F.x)+'" y2="'+f1(F.y)+'" stroke="#3a4d41" stroke-dasharray="2 3"/><ellipse cx="'+f1(F.x)+'" cy="'+f1(F.y)+'" rx="'+f1(6*F.k)+'" ry="'+f1(2.2*F.k*Math.max(0.3,cam.sp))+'" fill="#07100b"/>');});
 
   // proiezione sull'asse scelto: ritardo dello score rispetto alla media del ruolo
   var pr=ramp(lt,0.8,0.3), grow=ease(ramp(lt,0.9,1.3));
@@ -218,11 +218,11 @@ function render(t){
   var labels=[];
   order.forEach(function(i){
     var isP=i===c.n,isR=c.rm.indexOf(i)>=0,isM=mentorOn&&i===c.mi;
-    var fill=isP?ACC:(isR||isM?TEAL:'#b9b3a3'), r=(isP?8:(isR||isM?6:4.5))*pts[i].k;
-    h.push('<circle cx="'+f1(pts[i].x)+'" cy="'+f1(pts[i].y)+'" r="'+f1(r)+'" fill="'+fill+'" opacity="'+(isP||isR||isM?1:0.5)+'" stroke="#fbf9f3" stroke-width="1.5"/>');
+    var fill=isP?ACC:(isR||isM?TEAL:'#5d7064'), r=(isP?8:(isR||isM?6:4.5))*pts[i].k;
+    h.push('<circle cx="'+f1(pts[i].x)+'" cy="'+f1(pts[i].y)+'" r="'+f1(r)+'" fill="'+fill+'" opacity="'+(isP||isR||isM?1:0.5)+'" stroke="#142019" stroke-width="1.5"/>');
     if(isP||isR||isM)labels.push('<text x="'+f1(pts[i].x+10)+'" y="'+f1(pts[i].y+4)+'" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="'+(isP?600:400)+'" fill="'+(isP?ACC:TEAL)+'">'+AB[i]+'</text>');
   });
-  h.push('<polygon points="'+f1(R.x)+','+f1(R.y-8)+' '+f1(R.x+8)+','+f1(R.y)+' '+f1(R.x)+','+f1(R.y+8)+' '+f1(R.x-8)+','+f1(R.y)+'" fill="'+TEAL+'" stroke="#fbf9f3" stroke-width="1.5"/>');
+  h.push('<polygon points="'+f1(R.x)+','+f1(R.y-8)+' '+f1(R.x+8)+','+f1(R.y)+' '+f1(R.x)+','+f1(R.y+8)+' '+f1(R.x-8)+','+f1(R.y)+'" fill="'+TEAL+'" stroke="#142019" stroke-width="1.5"/>');
   h.push(labels.join(''));
 
   // effetto del miglioramento: z + Bᵀ Δx
@@ -244,7 +244,7 @@ function render(t){
       +'<line x1="'+f1(sx)+'" y1="'+f1(sy)+'" x2="'+f1(ex)+'" y2="'+f1(ey)+'" stroke="'+TEAL+'" stroke-width="2.5" stroke-linecap="round"/>'+arrowHead(ex,ey,mx,my,TEAL)
       +'<text x="'+f1(Mp.x)+'" y="'+f1(Mp.y<60?Mp.y+30:Mp.y-20)+'" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="600" fill="'+TEAL+'">mentore: '+c.mv.filter(function(m){return true;}).reduce(function(a,m){return m[1]>a[1]?m:a;})[0]+'</text>');
   }
-  h.push('<text x="548" y="444" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#8b8676">trascina per ruotare</text>');
+  h.push('<text x="548" y="444" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#7f9387">trascina per ruotare</text>');
   setHTML(svg,h.join(''));
 
   // ---- assi candidati e formula
@@ -261,7 +261,7 @@ function render(t){
   $('tblTitle').textContent='Pesi di b'+sub(j)+' nel verso '+((c.role==='piloni'||c.role==='centri')?'dei ':'delle ')+c.role;
   $('tblSub').textContent='s·B[k, '+(j+1)+'] con s = '+(c.s>0?'+1':'−1');
   var barG=ease(ramp(lt,3.2,1.2)), top6=lt>=4.6;
-  var TAGS={ok:['scelta',ACC,'#fff',ACC],extra:['valida, oltre le 3','#fbf9f3','#4b5149','#b9b3a3'],ruolo:['il ruolo non la usa','#ece6d6','#4b5149','#ece6d6'],sopra:['già ≥ media ruolo','#ece6d6','#4b5149','#ece6d6'],out:['fuori dai primi 6','#fbf9f3','#8b8676','#fbf9f3']};
+  var TAGS={ok:['scelta','transparent',ACC,'transparent'],extra:['valida, oltre le 3','transparent','#c3cec6','transparent'],ruolo:['il ruolo non la usa','transparent','#9fb0a4','transparent'],sopra:['già ≥ media ruolo','transparent','#9fb0a4','transparent'],out:['fuori dai primi 6','transparent','#6f8577','transparent']};
   function DP(v){return clamp((v+1.6)/4.8*100,0,100);}
   var rh='';
   c.rows.forEach(function(r,i){
@@ -269,13 +269,13 @@ function render(t){
     var tagAt=st==='out'?6.2:6.3+i*0.45;
     var tOp=step>=2?ramp(lt,tagAt,0.3):0, dOp=step>=2&&i<6?tOp:0;
     var px=DP(r[2]),rx=DP(r[3]),below=r[2]<r[3],dim=step>=3&&st!=='ok';
-    var bc=w>=0?(i<6&&top6?ACC:'#d9a58a'):'#c9c1ad';
-    rh+='<div class="grid row" style="background:'+(i<6&&top6?'#f1e8dc':'transparent')+';opacity:'+(dim?0.35:1)+'">'
+    var bc=w>=0?(i<6&&top6?ACC:'#8c7c3e'):'#3f5448';
+    rh+='<div class="grid row" style="background:'+(i<6&&top6?'#1b2a21':'transparent')+';opacity:'+(dim?0.35:1)+'">'
       +'<span class="mono" style="font-size:11px;color:var(--muted)">'+(step>=1?i+1:'')+'</span>'
       +'<span style="font-size:13px;font-weight:'+(st==='ok'&&step>=2?600:400)+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nice(r[0])+'</span>'
-      +'<div class="bars"><div style="position:absolute;left:58px;top:-4px;width:1px;height:22px;background:#c9c1ad"></div><div style="position:absolute;top:2px;left:'+f1(w>=0?58:58-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+bc+'"></div></div>'
+      +'<div class="bars"><div style="position:absolute;left:58px;top:-4px;width:1px;height:22px;background:#3f5448"></div><div style="position:absolute;top:2px;left:'+f1(w>=0?58:58-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+bc+'"></div></div>'
       +'<span class="mono" style="font-size:11.5px;text-align:right">'+(step>=1?fmt(w,2):'')+'</span>'
-      +'<div class="bars" style="opacity:'+dOp.toFixed(2)+'"><div style="position:absolute;left:0;top:6px;width:100px;height:1px;background:#ddd6c4"></div><div style="position:absolute;top:5px;left:'+f1(Math.min(px,rx))+'px;width:'+f1(Math.abs(px-rx))+'px;height:3px;background:'+(below?ACC:'#b9b3a3')+'"></div><div style="position:absolute;top:2px;left:'+f1(rx-4)+'px;width:8px;height:8px;transform:rotate(45deg);background:'+TEAL+'"></div><div style="position:absolute;top:1px;left:'+f1(px-5)+'px;width:10px;height:10px;border-radius:5px;background:'+(below?ACC:'#1c211d')+'"></div></div>'
+      +'<div class="bars" style="opacity:'+dOp.toFixed(2)+'"><div style="position:absolute;left:0;top:6px;width:100px;height:1px;background:#24342b"></div><div style="position:absolute;top:5px;left:'+f1(Math.min(px,rx))+'px;width:'+f1(Math.abs(px-rx))+'px;height:3px;background:'+(below?ACC:'#5d7064')+'"></div><div style="position:absolute;top:2px;left:'+f1(rx-4)+'px;width:8px;height:8px;transform:rotate(45deg);background:'+TEAL+'"></div><div style="position:absolute;top:1px;left:'+f1(px-5)+'px;width:10px;height:10px;border-radius:5px;background:'+(below?ACC:'#eef2ea')+'"></div></div>'
       +'<span class="tag" style="background:'+tg[1]+';color:'+tg[2]+';border-color:'+tg[3]+';opacity:'+tOp.toFixed(2)+'">'+tg[0]+'</span></div>';
   });
   setHTML($('rows'),rh);
@@ -288,18 +288,18 @@ function render(t){
       +'<div style="font-size:12.5px;line-height:1.45;color:var(--muted);margin-top:auto">Valori standardizzati: 1 = una deviazione standard della squadra. Il peso è la leva, il ritardo è il margine: contano tutti e due.</div>';
   }else if(step===3){
     var ge2=ease(ramp(lt,STEP_T[3]+0.3,1.4)),tot=0;
-    bh='<div style="display:flex;justify-content:space-between;align-items:baseline"><span class="serif" style="font-size:17px;font-weight:600">Effetto: peso × recupero</span><span class="mono" style="font-size:11.5px;color:var(--muted)">Δz'+sub(j)+' = Σ s·B[k,'+(j+1)+']·Δx_k</span></div>'
+    bh='<div style="display:flex;justify-content:space-between;align-items:baseline"><span class="serif" style="font-size:20px;font-weight:600">Effetto: peso × recupero</span><span class="mono" style="font-size:11.5px;color:var(--muted)">Δz'+sub(j)+' = Σ s·B[k,'+(j+1)+']·Δx_k</span></div>'
       +'<div class="mono" style="display:grid;grid-template-columns:170px 60px 80px 80px;gap:6px;font-size:11px;color:var(--muted)"><span>statistica</span><span>peso</span><span>recupero Δx</span><span>contributo</span></div>';
     c.contrib.forEach(function(r){tot+=r[3];bh+='<div style="display:grid;grid-template-columns:170px 60px 80px 80px;gap:6px;font-size:12.5px"><span>'+nice(r[0])+'</span><span class="mono">'+fmt(r[1],2)+'</span><span class="mono">'+fmt(r[2],2)+'</span><span class="mono" style="color:'+ACC+';font-weight:600">'+fmt(r[3],3)+'</span></div>';});
     var pct=Math.round(tot/c.gap*100);
-    bh+='<div style="height:12px;border-radius:6px;background:#ece6d6;position:relative;margin-top:4px"><div style="height:12px;border-radius:6px;width:'+f1(clamp(tot/c.gap,0,1)*100*ge2)+'%;background:'+ACC+'"></div></div>'
+    bh+='<div style="height:12px;border-radius:6px;background:#1f2e25;position:relative;margin-top:4px"><div style="height:12px;border-radius:6px;width:'+f1(clamp(tot/c.gap,0,1)*100*ge2)+'%;background:'+ACC+'"></div></div>'
       +'<div style="font-size:12.5px;line-height:1.45">Recupera <b>'+fmt(tot,2).replace('+','')+'</b> su un ritardo di <b>'+c.gap.toFixed(2).replace('.',',')+'</b> lungo b'+sub(j)+': <b style="color:'+ACC+'">'+pct+'%</b>. Nello spazio 3D si muove anche sugli altri assi: Δz = ('+c.dz.map(function(v){return fmt(v,2);}).join(', ')+').</div>';
   }else{
     var mG=ease(ramp(lt,STEP_T[4]+0.2,1)),best=0;c.mv.forEach(function(m,i){if(m[1]>c.mv[best][1])best=i;});
     var sel=c.contrib.map(function(r){return nice(r[0]);}).join(', ');
-    bh='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span class="serif" style="font-size:17px;font-weight:600">Mentore nel gruppo '+(c.g+1)+'</span><span style="font-size:11.5px;color:var(--muted)">media su: '+sel+'</span></div>';
+    bh='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span class="serif" style="font-size:20px;font-weight:600">Mentore nel gruppo '+(c.g+1)+'</span><span style="font-size:11.5px;color:var(--muted)">media su: '+sel+'</span></div>';
     c.mv.forEach(function(m,i){var len=Math.abs(m[1])/1.3*100*mG,win=i===best;
-      bh+='<div style="display:grid;grid-template-columns:130px 220px 50px minmax(0,1fr);gap:8px;align-items:center;height:22px"><span style="font-size:12.5px;font-weight:'+(win?600:400)+'">'+m[0]+'</span><div class="bars" style="height:12px"><div style="position:absolute;left:110px;top:-3px;width:1px;height:18px;background:#c9c1ad"></div><div style="position:absolute;top:1px;left:'+f1(m[1]>=0?110:110-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+(win?TEAL:'#c9c1ad')+'"></div></div><span class="mono" style="font-size:11.5px;text-align:right">'+fmt(m[1],2)+'</span><span style="font-size:11.5px;color:'+TEAL+';font-weight:600">'+(win&&mG>0.9?'mentore':'')+'</span></div>';});
+      bh+='<div style="display:grid;grid-template-columns:130px 220px 50px minmax(0,1fr);gap:8px;align-items:center;height:22px"><span style="font-size:12.5px;font-weight:'+(win?600:400)+'">'+m[0]+'</span><div class="bars" style="height:12px"><div style="position:absolute;left:110px;top:-3px;width:1px;height:18px;background:#3f5448"></div><div style="position:absolute;top:1px;left:'+f1(m[1]>=0?110:110-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+(win?TEAL:'#3f5448')+'"></div></div><span class="mono" style="font-size:11.5px;text-align:right">'+fmt(m[1],2)+'</span><span style="font-size:11.5px;color:'+TEAL+';font-weight:600">'+(win&&mG>0.9?'mentore':'')+'</span></div>';});
   }
   setHTML($('bottom'),bh);
 }
