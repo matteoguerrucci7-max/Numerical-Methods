@@ -40,6 +40,21 @@ GitHub only shows the raw HTML source when you click a file above —
 use the "open" links to see it rendered directly in the browser
 (via [htmlpreview.github.io](https://htmlpreview.github.io)).
 
+## Animations — PCA rugby project
+
+The [`download/`](download) folder holds standalone animations of a side
+project that applies chapter 1 and 7 tools (covariance, SVD, power method
+with deflation) to a synthetic rugby squad of 25 players × 10 statistics:
+find the playing-style axes, form balanced training groups, and pick each
+player's work direction and mentor. The text inside the animations is in
+Italian; each one runs offline, with pause, chapter buttons and drag-to-rotate.
+
+| File | Content | View rendered |
+|---|---|---|
+| [`pca_rugby_animazione.html`](download/pca_rugby_animazione.html) | Whole pipeline in the 3-component space — power method and deflation, players' scores, balanced groups by pairwise swaps, mentors | [open](https://htmlpreview.github.io/?https://raw.githubusercontent.com/matteoguerrucci7-max/Numerical-Methods/main/download/pca_rugby_animazione.html) |
+| [`pca_rugby_direzioni_3d.html`](download/pca_rugby_direzioni_3d.html) | Work directions in 3D — weakest axis vs the role mean, loadings `s·B[k,j]`, role filter, effect of the training `Δz = BᵀΔx`, mentor | [open](https://htmlpreview.github.io/?https://raw.githubusercontent.com/matteoguerrucci7-max/Numerical-Methods/main/download/pca_rugby_direzioni_3d.html) |
+| [`pca_rugby_animazione.mp4`](download/pca_rugby_animazione.mp4) | Video of the first animation (72 s, 1920×1200) | — |
+
 ## Sources
 
 - G. Puppo, *Metodi Numerici*, lecture notes, Sapienza Università di Roma
