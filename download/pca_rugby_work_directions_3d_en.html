@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work directions in 3D · PCA rugby</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1712;--card:#142019;--line:#24342b;--line2:#24342b;--ink:#eef2ea;--soft:#c3cec6;--muted:#9fb0a4;--faint:#7f9387;--acc:#f5d565;--accbg:#262d1c;--teal:#6cc4c0}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+body{display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
+#scaler{width:1280px;height:800px;transform-origin:top left}
+#app{width:1280px;height:800px;padding:22px 40px 22px;display:flex;flex-direction:column;gap:11px;overflow:hidden}
+.mono{font-family:'IBM Plex Mono',monospace}
+.serif{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+.kicker{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h1{margin:4px 0 0;font-weight:700;font-size:42px;line-height:1}
+button{font-family:'IBM Plex Sans',sans-serif}
+.ctl{height:44px;min-width:44px;border-radius:10px;border:1px solid #2c3f33;background:var(--card);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:14px;font-weight:500}
+.ctl:hover{background:#1f2e25}
+.tab{height:44px;padding:0 13px;border-radius:10px;border:1px solid #2c3f33;background:var(--card);color:var(--ink);cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab:hover{border-color:#7f9387}
+.tab.on{background:#1f2e25;color:var(--ink);border-color:var(--acc)}
+.step.on{background:#1f2e25;color:var(--ink);border-color:var(--acc)}
+.step.done{color:var(--ink)}
+.step{color:var(--muted)}
+.card{border-radius:16px;background:var(--card);border:1px solid var(--line);overflow:hidden}
+.legend{display:flex;gap:12px;align-items:center}
+.legend span{display:flex;align-items:center;gap:5px}
+.sw{width:9px;height:9px;border-radius:5px;display:inline-block}
+svg#st{display:block;cursor:grab;touch-action:none}
+.cand{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--bg);font-size:12.5px}
+.cand.on{background:var(--accbg);border-color:var(--acc)}
+.grid{display:grid;grid-template-columns:20px 128px 116px 42px 100px minmax(0,1fr);gap:6px;align-items:center;padding:0 6px}
+.row{height:27px;border-radius:6px}
+.bars{position:relative;height:14px}
+.tag{justify-self:start;font-size:11.5px;font-weight:500;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="app">
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px">
+<div><div class="kicker mono">PCA rugby · work directions in the 3D style space</div>
+<h1 class="serif">How to choose what to train, and with whom</h1></div>
+<div style="display:flex;gap:8px">
+<button class="ctl" id="restart" aria-label="Restart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+<button class="ctl" id="toggle"><svg id="icoPause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><svg id="icoPlay" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M7 4l13 8-13 8z"/></svg><span id="playLabel">Pause</span></button>
+</div>
+</div>
+
+<div style="display:flex;justify-content:space-between;gap:16px">
+<div style="display:flex;gap:6px" id="tabs"></div>
+<div style="display:flex;gap:6px" id="steps"></div>
+</div>
+
+<div style="height:22px;display:flex;align-items:center;gap:10px;font-size:14.5px">
+<span id="caption" style="color:var(--soft)"></span>
+</div>
+
+<div style="display:flex;gap:18px;flex-grow:1;min-height:0">
+
+<div class="card" style="width:560px;flex-shrink:0;display:flex;flex-direction:column">
+<div style="height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line2);font-size:12.5px;color:var(--muted)">
+<span class="mono">b₁ b₂ b₃ space · scores z</span>
+<div class="legend"><span><i class="sw" style="background:var(--acc)"></i><b id="legP" style="font-weight:500"></b></span><span><i class="sw" style="background:var(--teal)"></i>same role</span><span><i class="sw" style="background:var(--teal);border-radius:0;transform:rotate(45deg)"></i>role mean</span></div>
+</div>
+<svg id="st" width="560" height="452" viewBox="0 0 560 452"></svg>
+<div style="padding:2px 18px 12px;display:flex;flex-direction:column;gap:6px">
+<div id="cands" style="display:flex;flex-direction:column;gap:5px"></div>
+<div class="mono" id="formula" style="font-size:11.5px;color:var(--soft)"></div>
+</div>
+</div>
+
+<div class="card" style="flex-grow:1;min-width:0;padding:14px 20px;display:flex;flex-direction:column;gap:7px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+<span class="serif" style="font-size:23px;font-weight:600" id="tblTitle"></span>
+<span class="mono" style="font-size:12px;color:var(--muted)" id="tblSub"></span>
+</div>
+<div class="grid mono" style="font-size:11px;color:var(--muted)"><span>#</span><span>statistic</span><span style="text-align:center">weight</span><span></span><span>player ● vs role ◆</span><span>outcome</span></div>
+<div id="rows" style="display:flex;flex-direction:column;gap:2px"></div>
+<div id="bottom" style="border-top:1px solid var(--line2);padding-top:9px;flex-grow:1;display:flex;flex-direction:column;gap:6px"></div>
+</div>
+</div>
+</div></div>
+
+<script>
+// ------------------------------------------------------------ dati (dal codice del progetto)
+var Z = [[1.46,-1.47,-0.92],[1.31,-1.19,-0.79],[1.17,-0.71,-1.28],[1.08,-1.42,-1.39],[1.94,-0.28,-0.16],[1.52,-0.76,-0.46],[2.05,-0.18,-0.67],[3.45,-0.49,-0.09],[3.38,-0.73,-0.35],[1.1,1.71,0.9],[1.11,2.0,1.92],[-0.04,1.47,0.67],[0.75,0.75,0.94],[0.61,1.52,0.26],[-2.21,-3.28,1.48],[-2.23,-3.19,1.12],[-1.62,-1.83,0.19],[-2.17,-2.83,1.04],[-0.21,2.48,0.59],[-0.77,2.44,0.72],[-0.13,1.02,1.27],[-3.19,1.0,-1.46],[-2.53,1.45,-1.13],[-2.91,1.47,-1.38],[-2.9,1.05,-1.02]];
+var LAM = [3.945, 2.972, 1.047];
+var AB = ['PR1','PR2','PR3','PR4','HK1','HK2','LK1','LK2','LK3','BR1','BR2','BR3','BR4','BR5','SH1','SH2','FH1','FH2','CE1','CE2','CE3','WG1','WG2','WG3','FB'];
+var CASES = [
+ {n:2,name:'Prop 3',role:'props',j:1,s:-1,d:-0.28,cand:[[true,1,-0.04],[true,-1,-0.28]],rz:[1.25,-1.2,-1.09],rm:[0,1,3],
+  rows:[['passes',0.35,-0.56,-0.58,'ruolo'],['kicks_in_play',0.29,-0.48,-0.49,'ruolo'],['attacking_rucks',0.04,0.67,0.97,'ok'],['lineout_jumps',-0.02,-0.43,-0.48,'ruolo'],['tackles_made',-0.13,-0.1,-0.17,'ruolo'],['dominant_tackles',-0.22,-0.36,-0.31,'ruolo'],['metres_gained',-0.34,-1.03,-1.12,'out'],['defenders_beaten',-0.38,-1.15,-1.13,'out'],['offloads',-0.46,-0.88,-0.78,'out'],['carries',-0.49,0.59,-0.45,'out']],
+  dz:[0.14,-0.01,-0.06],contrib:[['attacking_rucks',0.04,0.29,0.013]],gap:0.49,
+  mv:[['Lock 1',1.08],['Back row 2',0.24],['Fly-half 2',-0.99],['Wing 2',-1.1]],mi:6,g:3},
+ {n:6,name:'Lock 1',role:'locks',j:0,s:1,d:-0.46,cand:[[true,1,-0.46],[false,-1,-0.17]],rz:[2.96,-0.47,-0.37],rm:[7,8],
+  rows:[['attacking_rucks',0.48,1.08,1.33,'ok'],['tackles_made',0.41,-0.15,0.9,'ok'],['dominant_tackles',0.34,0.53,0.54,'ok'],['lineout_jumps',0.32,1.6,2.38,'extra'],['carries',0.05,0.36,0.07,'sopra'],['offloads',-0.11,-0.5,-0.89,'ruolo'],['passes',-0.24,-0.61,-0.57,'out'],['kicks_in_play',-0.27,-0.5,-0.5,'out'],['defenders_beaten',-0.33,-0.75,-1.01,'out'],['metres_gained',-0.37,-0.83,-0.84,'out']],
+  dz:[0.55,0.13,0.36],contrib:[['attacking_rucks',0.48,0.26,0.122],['tackles_made',0.41,1.05,0.425],['dominant_tackles',0.34,0.02,0.006]],gap:0.91,
+  mv:[['Prop 3',0.07],['Back row 2',1.13],['Fly-half 2',-0.76],['Wing 2',-1.25]],mi:10,g:3},
+ {n:12,name:'Back row 4',role:'back-rowers',j:1,s:1,d:-0.43,cand:[[false,1,0.02],[true,1,-0.43]],rz:[0.71,1.49,0.94],rm:[9,10,11,13],
+  rows:[['carries',0.49,-0.5,0.46,'ok'],['offloads',0.46,0.35,1.01,'ok'],['defenders_beaten',0.38,0.52,0.47,'sopra'],['metres_gained',0.34,0.1,0.12,'ok'],['dominant_tackles',0.22,1.51,1.3,'sopra'],['tackles_made',0.13,0.33,0.53,'extra'],['lineout_jumps',0.02,0.35,0.26,'out'],['attacking_rucks',-0.04,0.14,0.14,'out'],['kicks_in_play',-0.29,-0.48,-0.48,'out'],['passes',-0.35,-0.24,-0.23,'out']],
+  dz:[-0.04,0.79,0.03],contrib:[['carries',0.49,0.95,0.471],['offloads',0.46,0.66,0.307],['metres_gained',0.34,0.02,0.007]],gap:0.74,
+  mv:[['Prop 1',-1.03],['Prop 2',-0.82],['Centre 3',0.46],['Fullback 1',1.17]],mi:24,g:0},
+ {n:16,name:'Fly-half 1',role:'fly-halves',j:1,s:-1,d:-0.29,cand:[[true,-1,-0.14],[true,-1,-0.29]],rz:[-1.9,-2.33,0.62],rm:[17],
+  rows:[['passes',0.35,0.91,0.92,'ok'],['kicks_in_play',0.29,2.19,2.94,'ok'],['attacking_rucks',0.04,-1.07,-1.03,'ruolo'],['lineout_jumps',-0.02,-0.44,-0.49,'ruolo'],['tackles_made',-0.13,-0.48,-0.41,'ruolo'],['dominant_tackles',-0.22,-0.87,-0.91,'ruolo'],['metres_gained',-0.34,-0.46,-0.3,'out'],['defenders_beaten',-0.38,-0.12,-0.25,'out'],['offloads',-0.46,-1.08,-0.82,'out'],['carries',-0.49,0.11,-0.69,'out']],
+  dz:[-0.21,-0.23,0.19],contrib:[['passes',0.35,0.02,0.006],['kicks_in_play',0.29,0.76,0.222]],gap:0.5,
+  mv:[['Prop 4',-0.55],['Hooker 2',-0.41],['Back row 3',-0.34],['Centre 2',-0.26]],mi:19,g:2},
+ {n:20,name:'Centre 3',role:'centres',j:1,s:1,d:-0.56,cand:[[false,-1,-0.12],[true,1,-0.56]],rz:[-0.37,1.98,0.86],rm:[18,19],
+  rows:[['carries',0.49,-0.47,0.88,'ok'],['offloads',0.46,1.13,1.2,'ok'],['defenders_beaten',0.38,0.2,0.92,'ok'],['metres_gained',0.34,0.73,0.71,'sopra'],['dominant_tackles',0.22,0.89,0.61,'sopra'],['tackles_made',0.13,0.81,0.8,'sopra'],['lineout_jumps',0.02,-0.34,-0.47,'out'],['attacking_rucks',-0.04,-0.51,-0.45,'out'],['kicks_in_play',-0.29,-0.26,-0.3,'out'],['passes',-0.35,-0.01,-0.14,'out']],
+  dz:[-0.18,0.98,-0.17],contrib:[['carries',0.49,1.35,0.669],['offloads',0.46,0.07,0.032],['defenders_beaten',0.38,0.72,0.275]],gap:0.96,
+  mv:[['Prop 1',-1.05],['Prop 2',-0.76],['Back row 4',0.12],['Fullback 1',0.82]],mi:24,g:0}
+];
+var NOTES = [
+ 'In the props\u2019 direction (low carrier) the largest weights are passes and kicks: playmaker statistics that props do not use. Only attacking rucks is left, with an almost zero weight (0.04).',
+ 'Four statistics pass the filter: the top 3 by weight are kept. Lineout jumps is left out, even though the player is well below the locks\u2019 mean there.',
+ 'Defenders beaten and dominant tackles weigh a lot on b₂, but Back row 4 is already above the back-rowers\u2019 mean: they are not needed.',
+ 'Only 2 statistics pass. On passes the player is below the fly-halves\u2019 mean by a tiny margin (0.91 against 0.92): the filter has no minimum threshold.',
+ 'The top three by weight are all valid: carries, offloads and defenders beaten.'
+];
+var CAPTIONS = [
+ 'Step 1 · The player’s score is compared with the mean of their role on b₁ and b₂ (b₃ is not used: it is unstable). The axis with the largest gap is chosen.',
+ 'Step 2 · The score is z = Bᵀx: the weight B[k,j] says how much z_j moves per unit of statistic k. The weights are sorted in the role\u2019s direction.',
+ 'Step 3 · Of the top 6, keep those the role really uses and on which the player is below the role mean: at most 3.',
+ 'Step 4 · If the player brings those statistics up to the role mean (Δx), the score moves by Δz = BᵀΔx: this is where it would land in 3D space.',
+ 'Step 5 · The mentor is the group teammate with the highest mean on those statistics.'
+];
+var STEP_LABELS = ['Weakest axis', 'Weights', 'Filter', 'Effect', 'Mentor'];
+var STEP_T = [0, 3, 6, 9.5, 12.3];
+var CT = 15, END = CT * CASES.length;
+var ACC = '#f5d565', TEAL = '#6cc4c0';
+var AXT = [['b₁ contact', 'wide game'], ['b₂ carrier', 'low carrier'], ['b₃ tackles, passes', 'carries, rucks']];
+var AXL = [3.9, 3.0, 2.3];
+var S = 58, CX = 280, CY = 214, FLOOR = -3.7;
+
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function ease(x){x=clamp(x,0,1);return x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;}
+function ramp(t,a,d){return clamp((t-a)/d,0,1);}
+function lerp(a,b,u){return a+(b-a)*u;}
+function fmt(x,d){var s=Math.abs(x).toFixed(d);return (x<0?'−':(x>0?'+':''))+s;}
+function f1(x){return x.toFixed(1);}
+function sub(j){return ['₁','₂','₃'][j];}
+function nice(s){return s.replace(/_/g,' ');}
+function project(z,cam){
+  var x1=z[0]*cam.cy-z[2]*cam.sy, d=z[0]*cam.sy+z[2]*cam.cy;
+  var yup=z[1]*cam.cp-d*cam.sp, depth=z[1]*cam.sp+d*cam.cp, k=14/(14-depth);
+  return {x:CX+x1*S*k, y:CY-yup*S*k, depth:depth, k:k};
+}
+function $(id){return document.getElementById(id);}
+function setHTML(el,h){if(el.__h!==h){el.innerHTML=h;el.__h=h;}}
+
+// ------------------------------------------------------------ stato e controlli
+var state={time:0,playing:true,yawOff:0,pitchOff:0};
+var speed=parseFloat(new URLSearchParams(location.search).get('speed')||'1');
+$('toggle').onclick=function(){state.playing=!state.playing;};
+$('restart').onclick=function(){state.time=0;state.playing=true;state.yawOff=0;state.pitchOff=0;};
+CASES.forEach(function(c,i){var b=document.createElement('button');b.className='tab';b.textContent=c.name;b.onclick=function(){state.time=i*CT+0.01;};$('tabs').appendChild(b);});
+STEP_LABELS.forEach(function(l,i){var b=document.createElement('button');b.className='tab step';b.innerHTML='<span class="mono" style="font-size:11px">'+(i+1)+'</span>'+l;b.onclick=function(){state.time=Math.floor(state.time/CT)*CT+STEP_T[i]+0.01;};$('steps').appendChild(b);});
+var svg=$('st'), drag=null;
+svg.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,yo:state.yawOff,po:state.pitchOff};svg.setPointerCapture(e.pointerId);});
+svg.addEventListener('pointermove',function(e){if(!drag)return;state.yawOff=drag.yo+(e.clientX-drag.x)*0.01;state.pitchOff=clamp(drag.po+(e.clientY-drag.y)*0.006,-0.55,0.95);});
+svg.addEventListener('pointerup',function(){drag=null;});
+document.addEventListener('keydown',function(e){if(e.code==='Space'&&e.target===document.body){e.preventDefault();state.playing=!state.playing;}});
+function fit(){var s=Math.min(1,window.innerWidth/1280,window.innerHeight/800),sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.width=1280*s+'px';sc.style.height=800*s+'px';}
+window.addEventListener('resize',fit);fit();
+
+// ------------------------------------------------------------ un fotogramma
+function arrowHead(x,y,ux,uy,col){return '<polygon points="'+f1(x+ux*3)+','+f1(y+uy*3)+' '+f1(x-ux*10-uy*5.5)+','+f1(y-uy*10+ux*5.5)+' '+f1(x-ux*10+uy*5.5)+','+f1(y-uy*10-ux*5.5)+'" fill="'+col+'"/>';}
+
+function render(t){
+  var ci=clamp(Math.floor(t/CT),0,CASES.length-1), lt=t-ci*CT;
+  var step=0;for(var s=0;s<STEP_T.length;s++)if(lt>=STEP_T[s])step=s;
+  var c=CASES[ci], j=c.j, pz=Z[c.n];
+
+  Array.prototype.forEach.call($('tabs').children,function(b,i){b.classList.toggle('on',i===ci);});
+  Array.prototype.forEach.call($('steps').children,function(b,i){b.classList.toggle('on',i===step);b.classList.toggle('done',i<step);});
+  $('caption').textContent=CAPTIONS[step];
+  $('legP').textContent=c.name;
+  $('playLabel').textContent=state.playing?'Pause':'Play';
+  $('icoPause').style.display=state.playing?'':'none';$('icoPlay').style.display=state.playing?'none':'';
+
+  // ---- scena 3D
+  var yaw=0.55+0.35*Math.sin(0.18*t)+state.yawOff, pitch=clamp(0.32+state.pitchOff,-0.2,1.3);
+  var cam={cy:Math.cos(yaw),sy:Math.sin(yaw),cp:Math.cos(pitch),sp:Math.sin(pitch)};
+  var h=[];
+  for(var a=-3.5;a<=3.51;a+=1.75){var p=project([a,FLOOR,-2.5],cam),q=project([a,FLOOR,2.5],cam);h.push('<line x1="'+f1(p.x)+'" y1="'+f1(p.y)+'" x2="'+f1(q.x)+'" y2="'+f1(q.y)+'" stroke="#22322a"/>');}
+  for(var b2=-2.5;b2<=2.51;b2+=1.25){var p2=project([-3.5,FLOOR,b2],cam),q2=project([3.5,FLOOR,b2],cam);h.push('<line x1="'+f1(p2.x)+'" y1="'+f1(p2.y)+'" x2="'+f1(q2.x)+'" y2="'+f1(q2.y)+'" stroke="#22322a"/>');}
+  var hl=ramp(lt,0.4,0.5)>0.5;
+  for(var k=0;k<3;k++){
+    var pv=[0,0,0],mv=[0,0,0],pl=[0,0,0],ml=[0,0,0];pv[k]=AXL[k];mv[k]=-AXL[k];pl[k]=AXL[k]+0.35;ml[k]=-AXL[k]-0.3;
+    var P=project(pv,cam),M=project(mv,cam),PL=project(pl,cam),ML=project(ml,cam),on=k===j&&hl;
+    h.push('<line x1="'+f1(M.x)+'" y1="'+f1(M.y)+'" x2="'+f1(P.x)+'" y2="'+f1(P.y)+'" stroke="'+(on?ACC:(k===2?'#33463a':'#5d7064'))+'" stroke-width="'+(on?3:1.2)+'"'+(k===2?' stroke-dasharray="4 4"':'')+' stroke-linecap="round"/>');
+    h.push('<text x="'+f1(PL.x)+'" y="'+f1(PL.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="500" fill="'+(on?ACC:(k===2?'#7f9387':'#9fb0a4'))+'">'+AXT[k][0]+'</text>');
+    h.push('<text x="'+f1(ML.x)+'" y="'+f1(ML.y+4)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7f9387">'+AXT[k][1]+'</text>');
+  }
+
+  var mentorOn=step===4, effOn=step>=3;
+  var pts=Z.map(function(z){return project(z,cam);});
+  var R=project(c.rz,cam), PP=pts[c.n];
+  // ombre per i punti in evidenza
+  var focus=[c.n].concat(c.rm); if(mentorOn)focus.push(c.mi);
+  focus.forEach(function(i){var F=project([Z[i][0],FLOOR,Z[i][2]],cam);h.push('<line x1="'+f1(pts[i].x)+'" y1="'+f1(pts[i].y)+'" x2="'+f1(F.x)+'" y2="'+f1(F.y)+'" stroke="#3a4d41" stroke-dasharray="2 3"/><ellipse cx="'+f1(F.x)+'" cy="'+f1(F.y)+'" rx="'+f1(6*F.k)+'" ry="'+f1(2.2*F.k*Math.max(0.3,cam.sp))+'" fill="#07100b"/>');});
+
+  // proiezione sull'asse scelto: ritardo dello score rispetto alla media del ruolo
+  var pr=ramp(lt,0.8,0.3), grow=ease(ramp(lt,0.9,1.3));
+  var ePa=[0,0,0],eRa=[0,0,0];ePa[j]=pz[j];eRa[j]=c.rz[j];
+  var Pa=project(ePa,cam),Ra=project(eRa,cam);
+  var gx=lerp(Ra.x,Pa.x,grow),gy=lerp(Ra.y,Pa.y,grow);
+  h.push('<g opacity="'+(pr*(step>=3?0.35:1)).toFixed(2)+'"><line x1="'+f1(PP.x)+'" y1="'+f1(PP.y)+'" x2="'+f1(Pa.x)+'" y2="'+f1(Pa.y)+'" stroke="'+ACC+'" stroke-width="1.2" stroke-dasharray="3 3"/>'
+    +'<line x1="'+f1(R.x)+'" y1="'+f1(R.y)+'" x2="'+f1(Ra.x)+'" y2="'+f1(Ra.y)+'" stroke="'+TEAL+'" stroke-width="1.2" stroke-dasharray="3 3"/>'
+    +'<line x1="'+f1(Ra.x)+'" y1="'+f1(Ra.y)+'" x2="'+f1(gx)+'" y2="'+f1(gy)+'" stroke="'+ACC+'" stroke-width="6" stroke-linecap="round" opacity="0.85"/>'
+    +'<text x="'+f1((Ra.x+Pa.x)/2+10)+'" y="'+f1((Ra.y+Pa.y)/2-8)+'" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="'+ACC+'">z'+sub(j)+' − mean = '+fmt(pz[j]-c.rz[j],2)+'</text></g>');
+
+  // giocatori, dal più lontano al più vicino
+  var order=Z.map(function(z,i){return i;}).sort(function(a,b){return pts[a].depth-pts[b].depth;});
+  var labels=[];
+  order.forEach(function(i){
+    var isP=i===c.n,isR=c.rm.indexOf(i)>=0,isM=mentorOn&&i===c.mi;
+    var fill=isP?ACC:(isR||isM?TEAL:'#5d7064'), r=(isP?8:(isR||isM?6:4.5))*pts[i].k;
+    h.push('<circle cx="'+f1(pts[i].x)+'" cy="'+f1(pts[i].y)+'" r="'+f1(r)+'" fill="'+fill+'" opacity="'+(isP||isR||isM?1:0.5)+'" stroke="#142019" stroke-width="1.5"/>');
+    if(isP||isR||isM)labels.push('<text x="'+f1(pts[i].x+10)+'" y="'+f1(pts[i].y+4)+'" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="'+(isP?600:400)+'" fill="'+(isP?ACC:TEAL)+'">'+AB[i]+'</text>');
+  });
+  h.push('<polygon points="'+f1(R.x)+','+f1(R.y-8)+' '+f1(R.x+8)+','+f1(R.y)+' '+f1(R.x)+','+f1(R.y+8)+' '+f1(R.x-8)+','+f1(R.y)+'" fill="'+TEAL+'" stroke="#142019" stroke-width="1.5"/>');
+  h.push(labels.join(''));
+
+  // effetto del miglioramento: z + Bᵀ Δx
+  if(effOn){
+    var ge=ease(ramp(lt,STEP_T[3]+0.3,1.4));
+    var tgt=[pz[0]+c.dz[0]*ge,pz[1]+c.dz[1]*ge,pz[2]+c.dz[2]*ge], T=project(tgt,cam);
+    var dx=T.x-PP.x,dy=T.y-PP.y,len=Math.hypot(dx,dy);
+    var op=step===4?0.45:1;
+    h.push('<g opacity="'+op+'"><circle cx="'+f1(T.x)+'" cy="'+f1(T.y)+'" r="9" fill="none" stroke="'+ACC+'" stroke-width="2" stroke-dasharray="3 3"/>');
+    if(len>14){var ux=dx/len,uy=dy/len;h.push('<line x1="'+f1(PP.x+ux*10)+'" y1="'+f1(PP.y+uy*10)+'" x2="'+f1(T.x-ux*12)+'" y2="'+f1(T.y-uy*12)+'" stroke="'+ACC+'" stroke-width="2.5" stroke-linecap="round"/>'+arrowHead(T.x-ux*12,T.y-uy*12,ux,uy,ACC));}
+    h.push('<text x="'+f1(T.x-14)+'" y="'+f1(T.y+4)+'" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="600" fill="'+ACC+'">after training</text></g>');
+  }
+  // mentore
+  if(mentorOn){
+    var Mp=pts[c.mi], g2=ease(ramp(lt,STEP_T[4]+0.3,0.8));
+    var mdx=PP.x-Mp.x,mdy=PP.y-Mp.y,ml2=Math.hypot(mdx,mdy)||1,mx=mdx/ml2,my=mdy/ml2;
+    var sx=Mp.x+mx*16,sy=Mp.y+my*16,ex=lerp(sx,PP.x-mx*14,g2),ey=lerp(sy,PP.y-my*14,g2);
+    h.push('<circle cx="'+f1(Mp.x)+'" cy="'+f1(Mp.y)+'" r="13" fill="none" stroke="'+TEAL+'" stroke-width="2.5"/>'
+      +'<line x1="'+f1(sx)+'" y1="'+f1(sy)+'" x2="'+f1(ex)+'" y2="'+f1(ey)+'" stroke="'+TEAL+'" stroke-width="2.5" stroke-linecap="round"/>'+arrowHead(ex,ey,mx,my,TEAL)
+      +'<text x="'+f1(Mp.x)+'" y="'+f1(Mp.y<60?Mp.y+30:Mp.y-20)+'" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="600" fill="'+TEAL+'">mentor: '+c.mv.filter(function(m){return true;}).reduce(function(a,m){return m[1]>a[1]?m:a;})[0]+'</text>');
+  }
+  h.push('<text x="548" y="444" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#7f9387">drag to rotate</text>');
+  setHTML(svg,h.join(''));
+
+  // ---- assi candidati e formula
+  var ch='';
+  c.cand.forEach(function(k,a){
+    var use=k[0]?'the role sits on the '+(k[1]>0?'+':'−')+' side':'the role is not characterised by this axis';
+    ch+='<div class="cand'+(a===j&&hl?' on':'')+'"><span class="mono" style="font-weight:500">b'+sub(a)+'</span><span style="flex-grow:1;color:var(--soft)">'+use+'</span><span class="mono">deficit '+(k[0]?fmt(k[2],2):'—')+'</span></div>';
+  });
+  setHTML($('cands'),ch);
+  $('formula').style.opacity=ramp(lt,1.8,0.5);
+  $('formula').textContent='deficit = s·(z'+sub(j)+' − mean)/√λ'+sub(j)+' = '+(c.s>0?'+1':'−1')+'·('+fmt(pz[j]-c.rz[j],2)+')/√'+LAM[j].toFixed(3)+' = '+fmt(c.d,2);
+
+  // ---- tabella dei pesi
+  $('tblTitle').textContent='b'+sub(j)+' weights in the '+c.role+'\u2019 direction';
+  $('tblSub').textContent='s·B[k, '+(j+1)+'] with s = '+(c.s>0?'+1':'−1');
+  var barG=ease(ramp(lt,3.2,1.2)), top6=lt>=4.6;
+  var TAGS={ok:['chosen','transparent',ACC,'transparent'],extra:['valid, beyond top 3','transparent','#c3cec6','transparent'],ruolo:['not used by the role','transparent','#9fb0a4','transparent'],sopra:['already ≥ role mean','transparent','#9fb0a4','transparent'],out:['outside top 6','transparent','#6f8577','transparent']};
+  function DP(v){return clamp((v+1.6)/4.8*100,0,100);}
+  var rh='';
+  c.rows.forEach(function(r,i){
+    var w=r[1],len=Math.abs(w)/0.5*54*barG,st=r[4],tg=TAGS[st];
+    var tagAt=st==='out'?6.2:6.3+i*0.45;
+    var tOp=step>=2?ramp(lt,tagAt,0.3):0, dOp=step>=2&&i<6?tOp:0;
+    var px=DP(r[2]),rx=DP(r[3]),below=r[2]<r[3],dim=step>=3&&st!=='ok';
+    var bc=w>=0?(i<6&&top6?ACC:'#8c7c3e'):'#3f5448';
+    rh+='<div class="grid row" style="background:'+(i<6&&top6?'#1b2a21':'transparent')+';opacity:'+(dim?0.35:1)+'">'
+      +'<span class="mono" style="font-size:11px;color:var(--muted)">'+(step>=1?i+1:'')+'</span>'
+      +'<span style="font-size:13px;font-weight:'+(st==='ok'&&step>=2?600:400)+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nice(r[0])+'</span>'
+      +'<div class="bars"><div style="position:absolute;left:58px;top:-4px;width:1px;height:22px;background:#3f5448"></div><div style="position:absolute;top:2px;left:'+f1(w>=0?58:58-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+bc+'"></div></div>'
+      +'<span class="mono" style="font-size:11.5px;text-align:right">'+(step>=1?fmt(w,2):'')+'</span>'
+      +'<div class="bars" style="opacity:'+dOp.toFixed(2)+'"><div style="position:absolute;left:0;top:6px;width:100px;height:1px;background:#24342b"></div><div style="position:absolute;top:5px;left:'+f1(Math.min(px,rx))+'px;width:'+f1(Math.abs(px-rx))+'px;height:3px;background:'+(below?ACC:'#5d7064')+'"></div><div style="position:absolute;top:2px;left:'+f1(rx-4)+'px;width:8px;height:8px;transform:rotate(45deg);background:'+TEAL+'"></div><div style="position:absolute;top:1px;left:'+f1(px-5)+'px;width:10px;height:10px;border-radius:5px;background:'+(below?ACC:'#eef2ea')+'"></div></div>'
+      +'<span class="tag" style="background:'+tg[1]+';color:'+tg[2]+';border-color:'+tg[3]+';opacity:'+tOp.toFixed(2)+'">'+tg[0]+'</span></div>';
+  });
+  setHTML($('rows'),rh);
+
+  // ---- riquadro in basso: nota, effetto o mentore
+  var bh='';
+  if(step<3){
+    var nOp=step>=2?ramp(lt,8.6,0.5):0;
+    bh='<div style="font-size:12.5px;line-height:1.45;color:var(--soft);opacity:'+nOp.toFixed(2)+'">'+NOTES[ci]+'</div>'
+      +'<div style="font-size:12.5px;line-height:1.45;color:var(--muted);margin-top:auto">Standardised values: 1 = one standard deviation of the squad. The weight is the lever, the gap is the room for improvement: both matter.</div>';
+  }else if(step===3){
+    var ge2=ease(ramp(lt,STEP_T[3]+0.3,1.4)),tot=0;
+    bh='<div style="display:flex;justify-content:space-between;align-items:baseline"><span class="serif" style="font-size:20px;font-weight:600">Effect: weight × recovery</span><span class="mono" style="font-size:11.5px;color:var(--muted)">Δz'+sub(j)+' = Σ s·B[k,'+(j+1)+']·Δx_k</span></div>'
+      +'<div class="mono" style="display:grid;grid-template-columns:170px 60px 80px 80px;gap:6px;font-size:11px;color:var(--muted)"><span>statistic</span><span>weight</span><span>recovery Δx</span><span>contribution</span></div>';
+    c.contrib.forEach(function(r){tot+=r[3];bh+='<div style="display:grid;grid-template-columns:170px 60px 80px 80px;gap:6px;font-size:12.5px"><span>'+nice(r[0])+'</span><span class="mono">'+fmt(r[1],2)+'</span><span class="mono">'+fmt(r[2],2)+'</span><span class="mono" style="color:'+ACC+';font-weight:600">'+fmt(r[3],3)+'</span></div>';});
+    var pct=Math.round(tot/c.gap*100);
+    bh+='<div style="height:12px;border-radius:6px;background:#1f2e25;position:relative;margin-top:4px"><div style="height:12px;border-radius:6px;width:'+f1(clamp(tot/c.gap,0,1)*100*ge2)+'%;background:'+ACC+'"></div></div>'
+      +'<div style="font-size:12.5px;line-height:1.45">Recovers <b>'+fmt(tot,2).replace('+','')+'</b> of a gap of <b>'+c.gap.toFixed(2)+'</b> along b'+sub(j)+': <b style="color:'+ACC+'">'+pct+'%</b>. In 3D space the player also moves along the other axes: Δz = ('+c.dz.map(function(v){return fmt(v,2);}).join(', ')+').</div>';
+  }else{
+    var mG=ease(ramp(lt,STEP_T[4]+0.2,1)),best=0;c.mv.forEach(function(m,i){if(m[1]>c.mv[best][1])best=i;});
+    var sel=c.contrib.map(function(r){return nice(r[0]);}).join(', ');
+    bh='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span class="serif" style="font-size:20px;font-weight:600">Mentor in group '+(c.g+1)+'</span><span style="font-size:11.5px;color:var(--muted)">mean over: '+sel+'</span></div>';
+    c.mv.forEach(function(m,i){var len=Math.abs(m[1])/1.3*100*mG,win=i===best;
+      bh+='<div style="display:grid;grid-template-columns:130px 220px 50px minmax(0,1fr);gap:8px;align-items:center;height:22px"><span style="font-size:12.5px;font-weight:'+(win?600:400)+'">'+m[0]+'</span><div class="bars" style="height:12px"><div style="position:absolute;left:110px;top:-3px;width:1px;height:18px;background:#3f5448"></div><div style="position:absolute;top:1px;left:'+f1(m[1]>=0?110:110-len)+'px;width:'+f1(len)+'px;height:10px;border-radius:2px;background:'+(win?TEAL:'#3f5448')+'"></div></div><span class="mono" style="font-size:11.5px;text-align:right">'+fmt(m[1],2)+'</span><span style="font-size:11.5px;color:'+TEAL+';font-weight:600">'+(win&&mG>0.9?'mentor':'')+'</span></div>';});
+  }
+  setHTML($('bottom'),bh);
+}
+
+// ------------------------------------------------------------ ciclo (window.__seek per registrare fotogramma per fotogramma)
+var last=performance.now();
+function loop(now){var dt=Math.min(0.1,(now-last)/1000);last=now;if(state.playing&&!window.__manual){state.time+=dt*speed;if(state.time>=END)state.time=0;}render(state.time);requestAnimationFrame(loop);}
+window.__seek=function(t){window.__manual=true;state.time=t;render(t);};
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
